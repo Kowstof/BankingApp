@@ -1,4 +1,6 @@
-﻿namespace BankingApp
+﻿using System.Collections;
+
+namespace BankingApp
 {
     public class Account
     {
@@ -9,6 +11,7 @@
         private string phone;
         private string address;
         private double balance;
+        private ArrayList transactions = new ArrayList();
 
         public Account(int accountNumber, string firstName, string lastName, string email, string phone, string address,
             double balance)
@@ -59,6 +62,11 @@
         public double GetBalance()
         {
             return balance;
+        }
+
+        public ArrayList GetTransactions()
+        {
+            return transactions;
         }
         
         /*****************************

@@ -7,18 +7,43 @@ namespace BankingApp
     {
         public static void Main(string[] args)
         {
+            ArrayList logins = new ArrayList();
             ArrayList accounts = new ArrayList();
-            
-            Console.WriteLine("Hello World!");
+
+            LoadLogins();
             Login();
             Console.ReadKey();
-        }
 
-        private static void Login()
-        {
-            Console.WriteLine("Welcome to Krystof Bank!");
-            Console.WriteLine("Customer ID: ");
-            Console.WriteLine("Password: ");
+            void LoadLogins()
+            {
+                string[] entries = System.IO.File.ReadAllLines("login.txt");
+                foreach (string entry in entries)
+                {
+                    string[] credentials = entry.Split('|');
+                    Login newLogin = new Login(credentials[0], credentials[1]);
+                    logins.Add(newLogin);
+                }
+            }
+            
+            void Login()
+            {
+                bool valid = false;
+                while (!valid)
+                {
+                    Console.WriteLine("Welcome to Krystof Bank!");
+                    Console.Write("Customer ID: ");
+                    string username = Console.ReadLine();
+                    Console.Write("Password: ");
+                    string password = Console.ReadLine();
+
+                    foreach (Login login in logins)
+                    {
+                        valid = login.Validate(username, password);
+                    }
+                }
+            }
+
+
         }
     }
 }

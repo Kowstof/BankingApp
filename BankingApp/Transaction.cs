@@ -2,7 +2,7 @@
 
 namespace BankingApp
 {
-    public class Transaction
+    public struct Transaction
     {
         private DateTime date;
         private double amount;
@@ -12,7 +12,5 @@ namespace BankingApp
             this.date = date;
             this.amount = amount;
         }
-        
-        
     }
 }
