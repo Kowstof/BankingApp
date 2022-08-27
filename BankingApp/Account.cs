@@ -36,6 +36,7 @@ namespace BankingApp
         public string LastName => _lastName;
         public string Phone => _phone;
         public ArrayList Transactions => _transactions;
+
         public double Balance
         {
             get => _balance;
