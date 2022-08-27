@@ -38,12 +38,14 @@ namespace BankingApp
 
                     foreach (Login login in logins)
                     {
-                        valid = login.Validate(username, password);
+                        if (login.Validate(username, password))
+                        {
+                            valid = true;
+                        }
                     }
                 }
+                Console.Write("Logged in!");
             }
-
-
         }
     }
 }
