@@ -2,80 +2,80 @@
 
 namespace BankingApp
 {
-    public class Account
+    internal class Account
     {
-        private int accountNumber;
-        private string firstName;
-        private string lastName;
-        private string email;
-        private string phone;
-        private string address;
-        private double balance;
-        private ArrayList transactions = new ArrayList();
+        private readonly int _accountNumber;
+        private readonly string _address;
+        private readonly string _email;
+        private readonly string _firstName;
+        private readonly string _lastName;
+        private readonly string _phone;
+        private readonly ArrayList _transactions = new ArrayList();
+        private double _balance;
 
         public Account(int accountNumber, string firstName, string lastName, string email, string phone, string address,
             double balance)
         {
-            this.accountNumber = accountNumber;
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.email = email;
-            this.phone = phone;
-            this.address = address;
-            this.balance = balance;
+            _accountNumber = accountNumber;
+            _firstName = firstName;
+            _lastName = lastName;
+            _email = email;
+            _phone = phone;
+            _address = address;
+            _balance = balance;
         }
-        
+
         /*****************************
          * GET METHODS
          *****************************/
 
         public int GetAccountNumber()
         {
-            return accountNumber;
+            return _accountNumber;
         }
 
         public string GetFirstName()
         {
-            return firstName;
+            return _firstName;
         }
 
         public string GetLastName()
         {
-            return lastName;
+            return _lastName;
         }
 
         public string GetEmail()
         {
-            return email;
+            return _email;
         }
 
         public string GetPhone()
         {
-            return phone;
+            return _phone;
         }
 
         public string GetAddress()
         {
-            return address;
+            return _address;
         }
 
         public double GetBalance()
         {
-            return balance;
+            return _balance;
         }
 
         public ArrayList GetTransactions()
         {
-            return transactions;
+            return _transactions;
         }
-        
+
         /*****************************
          * SET METHODS
          *****************************/
 
         public void SetBalance(double newBalance)
         {
-            balance = newBalance;
+            _balance = newBalance;
         }
     }
 }

@@ -1,49 +1,48 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
 
 namespace BankingApp
 {
-    internal class Program
+    internal static class Program
     {
         public static void Main(string[] args)
         {
-            ArrayList logins = new ArrayList();
-            ArrayList accounts = new ArrayList();
+            var logins = new ArrayList();
+            var accounts = new ArrayList();
 
             LoadLogins();
             Login();
             Console.ReadKey();
 
+
             void LoadLogins()
             {
-                string[] entries = System.IO.File.ReadAllLines("login.txt");
-                foreach (string entry in entries)
+                var entries = File.ReadAllLines("login.txt");
+                foreach (var entry in entries)
                 {
-                    string[] credentials = entry.Split('|');
-                    Login newLogin = new Login(credentials[0], credentials[1]);
+                    var credentials = entry.Split('|');
+                    var newLogin = new Login(credentials[0], credentials[1]);
                     logins.Add(newLogin);
                 }
             }
-            
+
             void Login()
             {
-                bool valid = false;
+                var valid = false;
                 while (!valid)
                 {
                     Console.WriteLine("Welcome to Krystof Bank!");
                     Console.Write("Customer ID: ");
-                    string username = Console.ReadLine();
+                    var username = Console.ReadLine();
                     Console.Write("Password: ");
-                    string password = Console.ReadLine();
+                    var password = Console.ReadLine();
 
                     foreach (Login login in logins)
-                    {
                         if (login.Validate(username, password))
-                        {
                             valid = true;
-                        }
-                    }
                 }
+
                 Console.Write("Logged in!");
             }
         }

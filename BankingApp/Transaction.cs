@@ -2,15 +2,15 @@
 
 namespace BankingApp
 {
-    public struct Transaction
+    internal struct Transaction
     {
-        private DateTime date;
-        private double amount;
+        private DateTime _date;
+        private double _amount;
 
         public Transaction(DateTime date, double amount)
         {
-            this.date = date;
-            this.amount = amount;
+            _date = date;
+            _amount = amount;
         }
     }
 }
