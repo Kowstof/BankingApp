@@ -2,7 +2,7 @@
 
 namespace BankingApp
 {
-    internal class Account
+    public class Account
     {
         private readonly int _accountNumber;
         private readonly string _address;
@@ -13,7 +13,7 @@ namespace BankingApp
         private readonly ArrayList _transactions = new ArrayList();
         private double _balance;
 
-        public Account(int accountNumber, string firstName, string lastName, string email, string phone, string address,
+        public Account(int accountNumber, string firstName, string lastName, string address, string phone, string email,
             double balance)
         {
             _accountNumber = accountNumber;
@@ -23,24 +23,6 @@ namespace BankingApp
             _phone = phone;
             _address = address;
             _balance = balance;
-        }
-
-        /*****************************
-         * GET/SET
-         *****************************/
-
-        public int AccountNumber => _accountNumber;
-        public string Address => _address;
-        public string Email => _email;
-        public string FirstName => _firstName;
-        public string LastName => _lastName;
-        public string Phone => _phone;
-        public ArrayList Transactions => _transactions;
-
-        public double Balance
-        {
-            get => _balance;
-            set => _balance = value;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace BankingApp
 {
-    internal readonly struct Login
+    public readonly struct Login
     {
         private readonly string _username;
         private readonly string _password;

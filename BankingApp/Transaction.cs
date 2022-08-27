@@ -2,7 +2,7 @@
 
 namespace BankingApp
 {
-    internal struct Transaction
+    public struct Transaction
     {
         private DateTime _date;
         private double _amount;
