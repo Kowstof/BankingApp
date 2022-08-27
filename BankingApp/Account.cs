@@ -26,56 +26,20 @@ namespace BankingApp
         }
 
         /*****************************
-         * GET METHODS
+         * GET/SET
          *****************************/
 
-        public int GetAccountNumber()
+        public int AccountNumber => _accountNumber;
+        public string Address => _address;
+        public string Email => _email;
+        public string FirstName => _firstName;
+        public string LastName => _lastName;
+        public string Phone => _phone;
+        public ArrayList Transactions => _transactions;
+        public double Balance
         {
-            return _accountNumber;
-        }
-
-        public string GetFirstName()
-        {
-            return _firstName;
-        }
-
-        public string GetLastName()
-        {
-            return _lastName;
-        }
-
-        public string GetEmail()
-        {
-            return _email;
-        }
-
-        public string GetPhone()
-        {
-            return _phone;
-        }
-
-        public string GetAddress()
-        {
-            return _address;
-        }
-
-        public double GetBalance()
-        {
-            return _balance;
-        }
-
-        public ArrayList GetTransactions()
-        {
-            return _transactions;
-        }
-
-        /*****************************
-         * SET METHODS
-         *****************************/
-
-        public void SetBalance(double newBalance)
-        {
-            _balance = newBalance;
+            get => _balance;
+            set => _balance = value;
         }
     }
 }
