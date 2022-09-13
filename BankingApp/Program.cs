@@ -32,20 +32,25 @@ namespace BankingApp
         private static void LoadAccounts(ArrayList accounts)
         {
             var accountFiles = Directory.GetFiles("", "??????.txt");
-            foreach (var file in accountFiles)
+            foreach (var accountFile in accountFiles)
             {
-                /*var fileOutput = File.ReadAllLines(file);
+                var allLines = File.ReadAllLines(accountFile);
                 var accountData = new ArrayList();
-                for (int i = 0; i < fileOutput.Length; i++)
+                for (var i = 0; i < 6; i++)
                 {
-                    accountData[i] = fileOutput[i].Split('|')[1];
+                    accountData[i] = allLines[i].Split('|')[1];
                 }
 
-                
-                for (int i = 0; i < account.Length; i++)
-                {
-                    var newAccount = new Account(account[0], )
-                }*/
+                var accountId = Convert.ToInt32(accountData[0]);
+                var firstName = Convert.ToString(accountData[1]);
+                var lastName = Convert.ToString(accountData[2]);
+                var address = Convert.ToString(accountData[3]);
+                var phone = Convert.ToString(accountData[4]);
+                var email = Convert.ToString(accountData[5]);
+                var balance = Convert.ToDouble(accountData[6]);
+                var loadedAccount = new Account(accountId, firstName, lastName, address, phone, email, balance);
+
+                accounts.Add(loadedAccount);
             }
         }
 
