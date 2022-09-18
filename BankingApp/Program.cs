@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -130,8 +129,7 @@ namespace BankingApp
                 email = Console.ReadLine();
             }
             
-            Console.Write("Is the information correct? (y/n): ");
-            var choice = YesNoChoice();
+            var choice = YesNoChoice("Is the information correct? (y/n): ");
             if (choice == "n")
                 CreateAccount(accounts);
 
@@ -139,7 +137,7 @@ namespace BankingApp
             var numAccounts = accounts.Count;
             var latest = accounts[numAccounts - 1].AccountNumber;
             var newAccNumber = latest + 1;
-            Account newAccount = new Account(newAccNumber, firstName, lastName, address, phone, email, 0.0);
+            var newAccount = new Account(newAccNumber, firstName, lastName, address, phone, email, 0.0);
             accounts.Add(newAccount);
             
             // Write new account file
@@ -153,56 +151,75 @@ namespace BankingApp
                 $"Email|{email}",
                 "Balance|0"
             };
-            File.WriteAllLines($"A{newAccNumber}", textFileLines);
+            File.WriteAllLines($"A{newAccNumber}.txt", textFileLines);
             
             // Send confirmation email
-            var smtpClient = new SmtpClient("smtp.google.com")
-            {
-                Port = 587,
-                Credentials = new NetworkCredential("krystof.pavlis-1@student.uts.edu.au", "puexriggoswsqmxe"),
-                EnableSsl = true,
-            };
-            
-            var mailMessage = new MailMessage()
-            {
-                From = new MailAddress("krystof.pavlis-1@student.uts.edu.au"),
-                Subject = $"Account A{newAccNumber} was successfully created!",
-                Body = newAccount.AccountSummary(),
-            };
-            mailMessage.To.Add("krystofpavlis@gmail.com");
+            var sendFrom = "krystofpavlis2@gmail.com";
+            var sendTo = email;
+            var subject = $"Account {newAccNumber} was created successfully!";
+            var body = newAccount.AccountSummary();
 
-            smtpClient.Send(mailMessage);
+            try
+            {
+                var smtpServer = new SmtpClient("smtp.gmail.com",587);
+                smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+                var mail = new MailMessage();
+                mail.From = new MailAddress(sendFrom);
+                mail.To.Add(sendTo);
+                mail.Subject = subject;
+                mail.Body = body;
+                smtpServer.Timeout = 5000;
+                smtpServer.EnableSsl = true;
+                smtpServer.UseDefaultCredentials = false;
+                smtpServer.Credentials = new NetworkCredential(sendFrom, "tflnyvdwaosotdwo");
+                smtpServer.Send(mail);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                Console.ReadKey();
+            }
             
-            Console.WriteLine("Account successfully created! A confirmation email has been sent.");
+            Console.WriteLine($"Account {newAccNumber} successfully created! A confirmation email has been sent.");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+            MainMenu(accounts);
         }
 
-        private static string YesNoChoice()
+        private static string YesNoChoice(string query)
         {
+            Console.Write(query);
+            var tempCursorTop = Console.CursorTop;
+            var tempCursorLeft = Console.CursorLeft;
             while (true)
             {
                 var choice = Console.ReadLine();
                 if (choice != null && (choice.Equals("y") || choice.Equals("n")))
                 {
-                    Console.SetCursorPosition(0, Console.CursorTop + 1);
+                    Console.SetCursorPosition(0, tempCursorTop + 1);
                     Console.Write(new string(' ', Console.WindowWidth));
                     return choice;
                 }
-                Console.SetCursorPosition(0, Console.CursorTop + 1);
+                Console.SetCursorPosition(0, tempCursorTop + 1);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Please type 'y' or 'n'");
                 Console.ForegroundColor = ConsoleColor.White;
+                Console.SetCursorPosition(0, tempCursorTop);
+                Console.Write(new string(' ', Console.WindowWidth));
+                Console.SetCursorPosition(0, tempCursorTop);
+                Console.Write(query);
             }
         }
 
         private static bool ValidateEmail(string email)
         {
-            Regex emailPattern = new Regex("^.+[@]((?:outlook\\.com)|(?:gmail\\.com)|(?:uts\\.edu\\.au))$");
+            var emailPattern = new Regex("^.+[@]((?:outlook\\.com)|(?:gmail\\.com)|(?:uts\\.edu\\.au))$");
             return emailPattern.IsMatch(email);
         }
 
         private static bool ValidatePhone(string phone)
         {
-            Regex phonePattern = new Regex("^[0-9]{10}$");
+            var phonePattern = new Regex("^[0-9]{10}$");
             return phonePattern.IsMatch(phone);
         }
 
@@ -230,7 +247,7 @@ namespace BankingApp
                 Console.SetCursorPosition(15, 6);
                 var password = Console.ReadLine();
 
-                foreach (Login login in logins)
+                foreach (var login in logins)
                     if (login.Validate(username, password))
                         valid = true;
                     else
