@@ -25,5 +25,10 @@ namespace BankingApp
             _address = address;
             _balance = balance;
         }
+
+        public string AccountSummary()
+        {
+            return "This will be the account summary!!";
+        }
     }
 }

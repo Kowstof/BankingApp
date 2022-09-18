@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Net.Mail;
 
 namespace BankingApp
 {
@@ -137,7 +139,7 @@ namespace BankingApp
             var numAccounts = accounts.Count;
             var latest = accounts[numAccounts - 1].AccountNumber;
             var newAccNumber = latest + 1;
-            var newAccount = new Account(newAccNumber, firstName, lastName, address, phone, email, 0.0);
+            Account newAccount = new Account(newAccNumber, firstName, lastName, address, phone, email, 0.0);
             accounts.Add(newAccount);
             
             // Write new account file
@@ -152,6 +154,24 @@ namespace BankingApp
                 "Balance|0"
             };
             File.WriteAllLines($"A{newAccNumber}", textFileLines);
+            
+            // Send confirmation email
+            var smtpClient = new SmtpClient("smtp.google.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("krystof.pavlis-1@student.uts.edu.au", "puexriggoswsqmxe"),
+                EnableSsl = true,
+            };
+            
+            var mailMessage = new MailMessage()
+            {
+                From = new MailAddress("krystof.pavlis-1@student.uts.edu.au"),
+                Subject = $"Account A{newAccNumber} was successfully created!",
+                Body = newAccount.AccountSummary(),
+            };
+            mailMessage.To.Add("krystofpavlis@gmail.com");
+
+            smtpClient.Send(mailMessage);
             
             Console.WriteLine("Account successfully created! A confirmation email has been sent.");
         }
