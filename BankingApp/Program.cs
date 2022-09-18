@@ -258,7 +258,15 @@ namespace BankingApp
             var sendFrom = "krystofpavlis2@gmail.com";
             var sendTo = email;
             var subject = $"Account {newAccNumber} was created successfully!";
-            var body = newAccount.AccountSummary();
+            var body = $@"
+            <h3>Account summary</h3>
+            <p>Account number: {newAccNumber}</p>
+            <p>First Name: {firstName}</p>
+            <p>Last Name: {lastName}</p>
+            <p>Address: {address}</p>
+            <p>Phone Number: {phone}</p>
+            <p>Email: {email}</p>
+            <p>Initial Balance: $0.00</p>";
 
             try
             {
@@ -269,6 +277,7 @@ namespace BankingApp
                 mail.To.Add(sendTo);
                 mail.Subject = subject;
                 mail.Body = body;
+                mail.IsBodyHtml = true;
                 smtpServer.Timeout = 5000;
                 smtpServer.EnableSsl = true;
                 smtpServer.UseDefaultCredentials = false;

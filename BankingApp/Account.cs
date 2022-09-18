@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 
 namespace BankingApp
 {
@@ -26,9 +27,32 @@ namespace BankingApp
             _balance = balance;
         }
 
-        public string AccountSummary()
+        public void AccountSummary()
         {
-            return "This will be the account summary!!";
+            Console.WriteLine("╔═══════════════════════════════════════════════╗");
+            Console.WriteLine("|                 ACCOUNT DETAILS               |");
+            Console.WriteLine("|═══════════════════════════════════════════════|");
+            Console.WriteLine("|                                               |");
+            Console.WriteLine("|    First Name:                                |");
+            Console.WriteLine("|    Last Name:                                 |");
+            Console.WriteLine("|    Address:                                   |");
+            Console.WriteLine("|    Phone:                                     |");
+            Console.WriteLine("|    Email:                                     |");
+            Console.WriteLine("╚═══════════════════════════════════════════════╝");
+
+            // This whole thing has to be done so the box keep its shape and alignment.
+            var endCursorTop = Console.CursorTop;
+            Console.SetCursorPosition(17, endCursorTop - 6);
+            Console.Write(_firstName);
+            Console.SetCursorPosition(16, endCursorTop - 5);
+            Console.Write(_lastName);
+            Console.SetCursorPosition(14, endCursorTop - 4);
+            Console.Write(_address);
+            Console.SetCursorPosition(12, endCursorTop - 3);
+            Console.Write(_phone);
+            Console.SetCursorPosition(12, endCursorTop - 2);
+            Console.Write(_email);
+            Console.SetCursorPosition(0, endCursorTop); // Reset cursor position
         }
     }
 }
