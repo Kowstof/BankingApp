@@ -86,17 +86,32 @@ namespace BankingApp
         private static void Login(ArrayList logins)
         {
             var valid = false;
+            var error = "r";
             while (!valid)
             {
-                Console.WriteLine("Welcome to Krystof Bank!");
-                Console.Write("Customer ID: ");
+                //Console.Clear();
+                Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                Console.WriteLine("|        WELCOME TO SIMPLE BANKING SYSTEM       |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|                 LOGIN TO START                |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("|    Username:                                  |");
+                Console.WriteLine("|    Password:                                  |");
+                Console.WriteLine("╚═══════════════════════════════════════════════╝");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(error);
+                Console.ForegroundColor = ConsoleColor.White;
+                
+                Console.SetCursorPosition(15, 5);
                 var username = Console.ReadLine();
-                Console.Write("Password: ");
+                Console.SetCursorPosition(15, 6);
                 var password = Console.ReadLine();
 
                 foreach (Login login in logins)
                     if (login.Validate(username, password))
                         valid = true;
+                    else
+                        error = "Incorrect username or password";
             }
 
             Console.Write("Logged in!");
