@@ -154,7 +154,7 @@ namespace BankingApp
                     Console.WriteLine("fg");
                     break;
                 case 7:
-                    Console.WriteLine("fg");
+                    Exit();
                     break;
             }
         }
@@ -324,7 +324,7 @@ namespace BankingApp
                         if (queryNum == account.AccountNumber) // Check if searched number matches
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine();
+                            Console.Clear();
                             Console.WriteLine("Account found!");
                             Console.ForegroundColor = ConsoleColor.White;
                             account.AccountSummary();
@@ -384,6 +384,14 @@ namespace BankingApp
         {
             var phonePattern = new Regex("^[0-9]{10}$");
             return phonePattern.IsMatch(phone);
+        }
+
+        private static void Exit()
+        {
+            Console.Clear();
+            Console.WriteLine("Thank you for using simple banking system! Closing...");
+            Thread.Sleep(1500);
+            Environment.Exit(1);
         }
     }
 }
