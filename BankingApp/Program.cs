@@ -36,16 +36,14 @@ namespace BankingApp
                files names (specifically login.txt), due to some quirk with how windows looks for shortened file names. The official 
                documentation contains an error, saying the '?' wildcard means 'exactly one character' when in reality is acts as 
                'zero or one'. https://stackoverflow.com/a/963408 */
+
             var accountFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "A??????.txt");
-            
+
             foreach (var accountFile in accountFiles)
             {
                 var allLines = File.ReadAllLines(accountFile);
                 var accountData = new string[7];
-                for (int i = 0; i < 7; i++)
-                {
-                    accountData[i] = allLines[i].Split('|')[1];
-                }
+                for (var i = 0; i < 7; i++) accountData[i] = allLines[i].Split('|')[1];
 
                 var accountId = Convert.ToInt32(accountData[0]);
                 var firstName = Convert.ToString(accountData[1]);
@@ -62,16 +60,37 @@ namespace BankingApp
 
         private static void CreateAccount()
         {
-            Console.WriteLine("Please Create a new account");
-            Console.Write("First name: ");
+            /*var firstName = "";
+            var lastName = "";
+            var address = "";
+            var phone = "";
+            var email = "";*/
+            var error = "";
+
+            Console.Clear();
+            Console.WriteLine("╔═══════════════════════════════════════════════╗");
+            Console.WriteLine("|              CREATE A NEW ACCOUNT             |");
+            Console.WriteLine("|═══════════════════════════════════════════════|");
+            Console.WriteLine("|              ENTER ACCOUNT DETAILS            |");
+            Console.WriteLine("|                                               |");
+            Console.WriteLine("|    First Name:                                |");
+            Console.WriteLine("|    Last Name:                                 |");
+            Console.WriteLine("|    Address:                                   |");
+            Console.WriteLine("|    Phone:                                     |");
+            Console.WriteLine("|    Email:                                     |");
+            Console.WriteLine("╚═══════════════════════════════════════════════╝");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(error);
+            Console.ForegroundColor = ConsoleColor.White;
+            
+            Console.SetCursorPosition(17, 5);
             var firstName = Console.ReadLine();
-            Console.Write("Last Name: ");
+            Console.SetCursorPosition(15, 6);
             var lastName = Console.ReadLine();
-            Console.Write("Address: ");
+            Console.SetCursorPosition(13, 7);
             var address = Console.ReadLine();
-            Console.Write("Phone: ");
+            Console.SetCursorPosition(11, 8);
             var phone = Console.ReadLine();
-            Console.Write("Email: ");
             var email = Console.ReadLine();
         }
 
@@ -107,7 +126,7 @@ namespace BankingApp
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine(error);
                 Console.ForegroundColor = ConsoleColor.White;
-                
+
                 Console.SetCursorPosition(15, 5);
                 var username = Console.ReadLine();
                 Console.SetCursorPosition(15, 6);
@@ -119,11 +138,73 @@ namespace BankingApp
                     else
                         error = "Incorrect username or password";
             }
+
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("Logged in!");
             Console.ForegroundColor = ConsoleColor.White;
             Thread.Sleep(1000);
+            MainMenu();
+        }
+
+        private static void MainMenu()
+        {
+            var valid = false;
+            var error = "";
+            var choice = "";
+
+            while (!valid)
+            {
+                Console.Clear();
+                Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                Console.WriteLine("|        WELCOME TO SIMPLE BANKING SYSTEM       |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|    1. Create a new account                    |");
+                Console.WriteLine("|    2. Search for an account                   |");
+                Console.WriteLine("|    3. Deposit                                 |");
+                Console.WriteLine("|    4. Withdraw                                |");
+                Console.WriteLine("|    5. Account statement                       |");
+                Console.WriteLine("|    6. Delete account                          |");
+                Console.WriteLine("|    7. Exit                                    |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|    Enter your choice:                         |");
+                Console.WriteLine("╚═══════════════════════════════════════════════╝");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(error);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                Console.SetCursorPosition(24, 11);
+                choice = Console.ReadLine();
+                if (choice != null && Regex.IsMatch(choice, "[1-7]"))
+                    valid = true;
+                else
+                    error = "Please enter a selection between 1 and 7";
+            }
+
+            switch (Convert.ToInt32(choice))
+            {
+                case 1:
+                    CreateAccount();
+                    break;
+                case 2:
+                    Console.WriteLine("fg");
+                    break;
+                case 3:
+                    Console.WriteLine("Yeah");
+                    break;
+                case 4:
+                    Console.WriteLine("fg");
+                    break;
+                case 5:
+                    Console.WriteLine("Yeah");
+                    break;
+                case 6:
+                    Console.WriteLine("fg");
+                    break;
+                case 7:
+                    Console.WriteLine("fg");
+                    break;
+            }
         }
     }
 }
