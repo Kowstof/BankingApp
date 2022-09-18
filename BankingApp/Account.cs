@@ -4,7 +4,8 @@ namespace BankingApp
 {
     public class Account
     {
-        private readonly int _accountNumber;
+        //private readonly int _accountNumber;
+        public int AccountNumber { get; }
         private readonly string _address;
         private readonly string _email;
         private readonly string _firstName;
@@ -16,7 +17,7 @@ namespace BankingApp
         public Account(int accountNumber, string firstName, string lastName, string address, string phone, string email,
             double balance)
         {
-            _accountNumber = accountNumber;
+            AccountNumber = accountNumber;
             _firstName = firstName;
             _lastName = lastName;
             _email = email;

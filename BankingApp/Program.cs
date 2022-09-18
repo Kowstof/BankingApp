@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -10,16 +11,16 @@ namespace BankingApp
     {
         public static void Main(string[] args)
         {
-            var logins = new ArrayList();
-            var accounts = new ArrayList();
+            var logins = new List<Login>();
+            var accounts = new List<Account>();
 
             LoadLogins(logins);
             LoadAccounts(accounts);
-            Login(logins);
+            Login(logins, accounts);
             Console.ReadKey();
         }
 
-        private static void LoadLogins(ArrayList logins)
+        private static void LoadLogins(List<Login> logins)
         {
             var entries = File.ReadAllLines("login.txt");
             foreach (var entry in entries)
@@ -30,7 +31,7 @@ namespace BankingApp
             }
         }
 
-        private static void LoadAccounts(ArrayList accounts)
+        private static void LoadAccounts(List<Account> accounts)
         {
             /* Unfortunately I had to specify that account files begin with 'A'. Otherwise, the search pattern would also match shorter
                files names (specifically login.txt), due to some quirk with how windows looks for shortened file names. The official 
@@ -58,7 +59,7 @@ namespace BankingApp
             }
         }
 
-        private static void CreateAccount()
+        private static void CreateAccount(List<Account> accounts)
         {
             Console.Clear();
             Console.WriteLine("╔═══════════════════════════════════════════════╗");
@@ -88,7 +89,7 @@ namespace BankingApp
                 if (ValidatePhone(phone))
                 {
                     Console.SetCursorPosition(0, 12);
-                    Console.Write(""); // Clear Error Message
+                    Console.Write(new string(' ', Console.WindowWidth)); // Clear Error Message
                     break;
                 }
                 // Display Error
@@ -112,7 +113,7 @@ namespace BankingApp
                 if (ValidateEmail(email))
                 {
                     Console.SetCursorPosition(0, 12);
-                    Console.Write(""); // Clear Error Message
+                    Console.Write(new string(' ', Console.WindowWidth)); // Clear Error Message
                     break;
                 }
                 // Display Error
@@ -126,9 +127,51 @@ namespace BankingApp
                 Console.SetCursorPosition(12, 9);
                 email = Console.ReadLine();
             }
-            Console.WriteLine();
-            Console.WriteLine("All Good!");
-            Console.ReadKey();
+            
+            Console.Write("Is the information correct? (y/n): ");
+            var choice = YesNoChoice();
+            if (choice == "n")
+                CreateAccount(accounts);
+
+            // Create the new account
+            var numAccounts = accounts.Count;
+            var latest = accounts[numAccounts - 1].AccountNumber;
+            var newAccNumber = latest + 1;
+            var newAccount = new Account(newAccNumber, firstName, lastName, address, phone, email, 0.0);
+            accounts.Add(newAccount);
+            
+            // Write new account file
+            string[] textFileLines =
+            {
+                $"AccountNo|{newAccNumber}",
+                $"First Name|{firstName}",
+                $"Last Name|{lastName}",
+                $"Address|{address}",
+                $"Phone|{phone}",
+                $"Email|{email}",
+                "Balance|0"
+            };
+            File.WriteAllLines($"A{newAccNumber}", textFileLines);
+            
+            Console.WriteLine("Account successfully created! A confirmation email has been sent.");
+        }
+
+        private static string YesNoChoice()
+        {
+            while (true)
+            {
+                var choice = Console.ReadLine();
+                if (choice != null && (choice.Equals("y") || choice.Equals("n")))
+                {
+                    Console.SetCursorPosition(0, Console.CursorTop + 1);
+                    Console.Write(new string(' ', Console.WindowWidth));
+                    return choice;
+                }
+                Console.SetCursorPosition(0, Console.CursorTop + 1);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Please type 'y' or 'n'");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
         }
 
         private static bool ValidateEmail(string email)
@@ -143,7 +186,7 @@ namespace BankingApp
             return phonePattern.IsMatch(phone);
         }
 
-        private static void Login(ArrayList logins)
+        private static void Login(List<Login> logins, List<Account> accounts)
         {
             var valid = false;
             var error = "";
@@ -179,10 +222,10 @@ namespace BankingApp
             Console.Write("Logged in!");
             Console.ForegroundColor = ConsoleColor.White;
             Thread.Sleep(1000);
-            MainMenu();
+            MainMenu(accounts);
         }
 
-        private static void MainMenu()
+        private static void MainMenu(List<Account> accounts)
         {
             var valid = false;
             var error = "";
@@ -219,7 +262,7 @@ namespace BankingApp
             switch (Convert.ToInt32(choice))
             {
                 case 1:
-                    CreateAccount();
+                    CreateAccount(accounts);
                     break;
                 case 2:
                     Console.WriteLine("fg");
