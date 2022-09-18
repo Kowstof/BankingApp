@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace BankingApp
 {
@@ -31,12 +32,17 @@ namespace BankingApp
 
         private static void LoadAccounts(ArrayList accounts)
         {
-            var accountFiles = Directory.GetFiles("", "??????.txt");
+            /* Unfortunately I had to specify that account files begin with 'A'. Otherwise, the search pattern would also match shorter
+               files names (specifically login.txt), due to some quirk with how windows looks for shortened file names. The official 
+               documentation contains an error, saying the '?' wildcard means 'exactly one character' when in reality is acts as 
+               'zero or one'. https://stackoverflow.com/a/963408 */
+            var accountFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "A??????.txt");
+            
             foreach (var accountFile in accountFiles)
             {
                 var allLines = File.ReadAllLines(accountFile);
-                var accountData = new ArrayList();
-                for (var i = 0; i < 6; i++)
+                var accountData = new string[7];
+                for (int i = 0; i < 7; i++)
                 {
                     accountData[i] = allLines[i].Split('|')[1];
                 }
@@ -86,10 +92,10 @@ namespace BankingApp
         private static void Login(ArrayList logins)
         {
             var valid = false;
-            var error = "r";
+            var error = "";
             while (!valid)
             {
-                //Console.Clear();
+                Console.Clear();
                 Console.WriteLine("╔═══════════════════════════════════════════════╗");
                 Console.WriteLine("|        WELCOME TO SIMPLE BANKING SYSTEM       |");
                 Console.WriteLine("|═══════════════════════════════════════════════|");
@@ -113,8 +119,11 @@ namespace BankingApp
                     else
                         error = "Incorrect username or password";
             }
-
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.Write("Logged in!");
+            Console.ForegroundColor = ConsoleColor.White;
+            Thread.Sleep(1000);
         }
     }
 }
