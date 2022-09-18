@@ -139,7 +139,7 @@ namespace BankingApp
                     CreateAccount(accounts);
                     break;
                 case 2:
-                    Console.WriteLine("fg");
+                    SearchAccount(accounts);
                     break;
                 case 3:
                     Console.WriteLine("Yeah");
@@ -285,6 +285,58 @@ namespace BankingApp
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
             MainMenu(accounts);
+        }
+
+        public static void SearchAccount(List<Account> accounts)
+        {
+            var valid = false;
+            var error = "";
+            while (!valid)
+            {
+                Console.Clear();
+                Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                Console.WriteLine("|                 FIND AN ACCOUNT               |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("|    Number:                                    |");
+                Console.WriteLine("╚═══════════════════════════════════════════════╝");
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(error);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                Console.SetCursorPosition(13, 5);
+                var query = Console.ReadLine();
+                if (query != null && Regex.IsMatch(query, "[0-9]{6}")) // If the input is 6 numbers...
+                {
+                    var queryNum = Convert.ToInt32(query);
+                    foreach (var account in accounts) // For each account...
+                        if (queryNum == account.AccountNumber) // Check if searched number matches
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine();
+                            Console.WriteLine("Account found!");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            account.AccountSummary();
+                            var again = YesNoChoice("Find another account? (y/n): ");
+                            if (again == "y")
+                                SearchAccount(accounts);
+                            MainMenu(accounts);
+                        }
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine();
+                    Console.WriteLine("Account not found!");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    var tryAgain = YesNoChoice("Find another account? (y/n): ");
+                    if (tryAgain == "y")
+                        SearchAccount(accounts);
+                    MainMenu(accounts);
+                }
+
+                error = "Incorrect account number format";
+            }
         }
 
         private static string YesNoChoice(string query)
