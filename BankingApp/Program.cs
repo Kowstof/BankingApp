@@ -60,13 +60,6 @@ namespace BankingApp
 
         private static void CreateAccount()
         {
-            /*var firstName = "";
-            var lastName = "";
-            var address = "";
-            var phone = "";
-            var email = "";*/
-            var error = "";
-
             Console.Clear();
             Console.WriteLine("╔═══════════════════════════════════════════════╗");
             Console.WriteLine("|              CREATE A NEW ACCOUNT             |");
@@ -79,33 +72,75 @@ namespace BankingApp
             Console.WriteLine("|    Phone:                                     |");
             Console.WriteLine("|    Email:                                     |");
             Console.WriteLine("╚═══════════════════════════════════════════════╝");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(error);
-            Console.ForegroundColor = ConsoleColor.White;
-            
+
             Console.SetCursorPosition(17, 5);
             var firstName = Console.ReadLine();
-            Console.SetCursorPosition(15, 6);
+            Console.SetCursorPosition(16, 6);
             var lastName = Console.ReadLine();
-            Console.SetCursorPosition(13, 7);
+            Console.SetCursorPosition(14, 7);
             var address = Console.ReadLine();
-            Console.SetCursorPosition(11, 8);
+            Console.SetCursorPosition(12, 8);
             var phone = Console.ReadLine();
+  
+            while(true)
+            {
+                // Move on if all good
+                if (ValidatePhone(phone))
+                {
+                    Console.SetCursorPosition(0, 12);
+                    Console.Write(""); // Clear Error Message
+                    break;
+                }
+                // Display Error
+                Console.SetCursorPosition(0, 12);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Phone number format incorrect");
+                Console.ForegroundColor = ConsoleColor.White;
+                // Try again
+                Console.SetCursorPosition(0, 8);
+                Console.Write("|    Phone:                                     |");
+                Console.SetCursorPosition(12, 8);
+                phone = Console.ReadLine();
+            }
+            
+            Console.SetCursorPosition(12, 9);
             var email = Console.ReadLine();
+            
+            while (true)
+            {
+                // Move on if all good
+                if (ValidateEmail(email))
+                {
+                    Console.SetCursorPosition(0, 12);
+                    Console.Write(""); // Clear Error Message
+                    break;
+                }
+                // Display Error
+                Console.SetCursorPosition(0, 12);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Email format incorrect");
+                Console.ForegroundColor = ConsoleColor.White;
+                // Try again
+                Console.SetCursorPosition(0, 9);
+                Console.Write("|    Email:                                     |");
+                Console.SetCursorPosition(12, 9);
+                email = Console.ReadLine();
+            }
+            Console.WriteLine();
+            Console.WriteLine("All Good!");
+            Console.ReadKey();
         }
 
         private static bool ValidateEmail(string email)
         {
-            const string emailPattern = "/^.+[@]((?:outlook\\.com)|(?:gmail\\.com)|(?:uts\\.edu\\.au))$/gm";
-            var result = Regex.Match(email, emailPattern);
-            return result.Success;
+            Regex emailPattern = new Regex("^.+[@]((?:outlook\\.com)|(?:gmail\\.com)|(?:uts\\.edu\\.au))$");
+            return emailPattern.IsMatch(email);
         }
 
         private static bool ValidatePhone(string phone)
         {
-            const string phonePattern = "^[0-9]{10}$";
-            var result = Regex.Match(phone, phonePattern);
-            return result.Success;
+            Regex phonePattern = new Regex("^[0-9]{10}$");
+            return phonePattern.IsMatch(phone);
         }
 
         private static void Login(ArrayList logins)
