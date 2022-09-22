@@ -123,7 +123,10 @@ namespace BankingApp
             Console.WriteLine("Date  |  Action  |  Amount  |  Balance");
             Console.ForegroundColor = ConsoleColor.White;
             var transactionsReversed = _transactions.AsEnumerable().Reverse().ToList();
-            for (var i = 0; i < 5; i++)
+            var maxCount = transactionsReversed.Count;
+            if (maxCount > 5)
+                maxCount = 5;
+            for (var i = 0; i < maxCount; i++)
             {
                 Console.WriteLine(transactionsReversed[i].Print());
             }
@@ -134,8 +137,11 @@ namespace BankingApp
             var summary = GenerateEmailSummary();
             var tables = $@"";
             var transactionsReversed = _transactions.AsEnumerable().Reverse().ToList();
+            var maxCount = transactionsReversed.Count;
+            if (maxCount > 5)
+                maxCount = 5;
 
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < maxCount; i++)
             {
                 tables += transactionsReversed[i].PrintEmail();
             }
