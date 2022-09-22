@@ -102,13 +102,15 @@ namespace BankingApp
         {
             var body = $@"
                 <h3>Account Details</h3>
-                <p>Account number: {AccountNumber}</p>
-                <p>First Name: {_firstName}</p>
-                <p>Last Name: {_lastName}</p>
-                <p>Address: {_address}</p>
-                <p>Phone Number: {_phone}</p>
-                <p>Email: {Email}</p>
-                <p>Balance: {Balance:c2}</p>";
+                <ul>
+                    <li>Account number: {AccountNumber}</li>
+                    <li>First Name: {_firstName}</li>
+                    <li>Last Name: {_lastName}</li>
+                    <li>Address: {_address}</li>
+                    <li>Phone Number: {_phone}</li>
+                    <li>Email: {Email}</li>
+                    <li>Balance: {Balance:c2}</li>
+                </ul>";
             return body;
         }
 
@@ -117,8 +119,12 @@ namespace BankingApp
             GenerateSummary();
             Console.WriteLine();
             Console.WriteLine("Your 5 most recent transactions:");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Date  |  Action  |  Amount  |  Balance");
+            Console.ForegroundColor = ConsoleColor.White;
             var transactionsReversed = _transactions.AsEnumerable().Reverse().ToList();
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < 5; i++)
             {
                 Console.WriteLine(transactionsReversed[i].Print());
             }
@@ -130,7 +136,7 @@ namespace BankingApp
             var tables = $@"";
             var transactionsReversed = _transactions.AsEnumerable().Reverse().ToList();
 
-            for (var i = 0; i < 4; i++)
+            for (var i = 0; i < 5; i++)
             {
                 tables += transactionsReversed[i].PrintEmail();
             }
@@ -138,6 +144,7 @@ namespace BankingApp
             var body = $@"
                 <h2>Your Statement</h2>
                 {summary}
+                <h3>Most Recent Transactions</h3>
                 <table>
                 <thead>
                   <tr>

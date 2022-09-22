@@ -20,7 +20,7 @@ namespace BankingApp
         public string Print()
         {
             var date = _date.ToString("dd.MM.yyyy");
-            return $"{date}|{_action}|{_amount}|{_balance}";
+            return $"{date} | {_action} | {_amount:c2} | {_balance:c2}";
         }
 
         public string PrintEmail()
@@ -30,8 +30,8 @@ namespace BankingApp
             <tr>
                 <td>{date}</td>
                 <td>{_action}</td>
-                <td>{_amount}</td>
-                <td>{_balance}</td>
+                <td>{_amount:c2}</td>
+                <td>{_balance:c2}</td>
             </tr>";
             return row;
         }

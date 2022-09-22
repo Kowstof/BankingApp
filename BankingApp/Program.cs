@@ -480,6 +480,7 @@ namespace BankingApp
                     Console.Clear();
                     Success(0,"Account found!");
                     account.GenerateStatement();
+                    Console.WriteLine();
                     var sendEmail = YesNoChoice("Do you want your statement emailed? (y/n): ");
                     if (sendEmail == "n") return;
 
@@ -487,7 +488,7 @@ namespace BankingApp
                     var body = account.GenerateEmailStatement();
                     
                     SendEmail(account.Email, subject, body);
-                    Console.WriteLine($"Your statement has been successfully emailed to {account.Email}.");
+                    Success(0, $"Your statement has been successfully emailed to {account.Email}.");
                     Console.WriteLine("Press any key to continue...");
                     Console.ReadKey();
                     return;
