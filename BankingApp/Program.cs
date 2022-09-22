@@ -19,6 +19,11 @@ namespace BankingApp
             LoadLogins(logins, accounts);
             Exit();
         }
+        
+        /// <summary>
+        /// Finds the 'login.txt' file and creates Login objects to add to the global list.
+        /// Handles file not found and exits - can't use program without logins.
+        /// </summary>
 
         private static void LoadLogins(List<Login> logins, List<Account> accounts)
         {
@@ -46,19 +51,20 @@ namespace BankingApp
             LoadAccounts(logins, accounts);
         }
 
+        /// <summary>
+        /// Unfortunately I had to specify that account files begin with 'A'. Otherwise, the search pattern would also match shorter
+        /// files names (specifically login.txt), due to some quirk with how windows looks for shortened file names. The official
+        /// documentation contains an error, saying the '?' wildcard means 'exactly one character' when in reality is acts as
+        /// 'zero or one'. https://stackoverflow.com/a/963408 
+        /// </summary>
+        
         private static void LoadAccounts(List<Login> logins, List<Account> accounts)
         {
-            /* Unfortunately I had to specify that account files begin with 'A'. Otherwise, the search pattern would also match shorter
-               files names (specifically login.txt), due to some quirk with how windows looks for shortened file names. The official 
-               documentation contains an error, saying the '?' wildcard means 'exactly one character' when in reality is acts as 
-               'zero or one'. https://stackoverflow.com/a/963408 */
-
             var accountFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "A??????.txt");
 
             try
             {
-                foreach (var accountFile in
-                         accountFiles) // no need for try-catch as the code gets skipped if the array is empty
+                foreach (var accountFile in accountFiles) // no need for try-catch as the code gets skipped if the array is empty
                 {
                     var allLines = File.ReadAllLines(accountFile);
                     var accountData = new string[7]; //First 7 fields are data, rest are transactions
@@ -96,9 +102,10 @@ namespace BankingApp
                 Error(0, "Existing accounts have been found but their data seems corrupted. Fix or remove the corrupted files.");
             }
 
-            Login(logins, accounts);
+            Login(logins, accounts); // after all external files are loaded in, launch login window
         }
 
+        
         private static void Login(List<Login> logins, List<Account> accounts)
         {
             var valid = false;
@@ -133,6 +140,7 @@ namespace BankingApp
             Thread.Sleep(1000);
             MainMenu(accounts);
         }
+        
 
         private static string GetPassword()
         {
@@ -155,6 +163,7 @@ namespace BankingApp
             }
             return password;
         }
+        
 
         private static void MainMenu(List<Account> accounts)
         {
@@ -190,8 +199,6 @@ namespace BankingApp
                         valid = true;
                     else
                         error = "Please enter a selection between 1 and 7";
-                  
-
                 }
 
                 switch (Convert.ToInt32(choice))
@@ -280,7 +287,7 @@ namespace BankingApp
 
                     // Display Error
                     Error(3, "Incorrect email format");
-                    // Try again
+                    // Clear prev attempt and try again
                     Console.SetCursorPosition(0, 9);
                     Console.Write("|    Email:                                     |");
                     Console.SetCursorPosition(12, 9);
@@ -292,12 +299,12 @@ namespace BankingApp
                 
                 // Create the new account
                 var numAccounts = accounts.Count;
-                var latest = accounts[numAccounts - 1].AccountNumber;
-                var newAccNumber = latest + 1;
+                var latestAccNum = accounts[numAccounts - 1].AccountNumber;
+                var newAccNumber = latestAccNum + 1;
                 var newAccount = new Account(newAccNumber, firstName, lastName, address, phone, email, 0.0);
                 accounts.Add(newAccount);
 
-                // Write new account file
+                // Write new account .txt file
                 string[] textFileLines =
                 {
                     $"AccountNo|{newAccNumber}",
@@ -383,9 +390,11 @@ namespace BankingApp
         }
 
 
+        // The core account searching function used by most other methods. 
         private static Account SearchAccounts(List<Account> accounts)
         {
-            var initialCursorTop = Console.CursorTop;
+            // Remember where the cursor was initially
+            var initialCursorTop = Console.CursorTop; 
             var initialCursorLeft = Console.CursorLeft;
             while (true)
             {
@@ -393,16 +402,16 @@ namespace BankingApp
                 var query = Console.ReadLine();
                 if (query != null && Regex.IsMatch(query, "[0-9]{6}")) // If the input is 6 numbers...
                 {
-                    Console.SetCursorPosition(0, initialCursorTop + 3);
+                    Console.SetCursorPosition(0, initialCursorTop + 3); // go under the box borders
                     Console.Write(new string(' ', Console.WindowWidth)); // clear any error messages
-                    Console.SetCursorPosition(initialCursorLeft, initialCursorTop);
+                    Console.SetCursorPosition(initialCursorLeft, initialCursorTop); 
                     var queryNum = Convert.ToInt32(query); // after regex check we can assume it will parse
-                    return accounts.FirstOrDefault(account => queryNum == account.AccountNumber);
+                    return accounts.FirstOrDefault(account => queryNum == account.AccountNumber); // return either a matching account, or null
                 }
 
                 // If incorrect format
                 Console.SetCursorPosition(0, initialCursorTop);
-                Console.Write("|    Number:                                    |"); // Fills in rest of line with blank spaces without spilling to next line
+                Console.Write("|    Number:                                    |"); // Resets the input field
                 Error(3, "Incorrect number format");
             }
         }
@@ -438,12 +447,12 @@ namespace BankingApp
                     Console.Write("|    Amount: $                                  |");
                     Console.SetCursorPosition(14, 6);
                     var amount = Console.ReadLine();
-                    if (!double.TryParse(amount, out var amountNum) || amountNum < 0)
+                    if (!double.TryParse(amount, out var amountNum) || amountNum <= 0) // if it doesn't parse as double OR is less than 0
                     {
                         Error(2, "Please enter a number greater than 0");
                         continue;
                     }
-                    // If all good
+                    // If input is validated
                     account.Deposit(amountNum);
                     Console.Clear();
                     Success(0, "Deposit successful!");
@@ -484,7 +493,7 @@ namespace BankingApp
                     Console.Write("|    Amount: $                                  |");
                     Console.SetCursorPosition(14, 6);
                     var amount = Console.ReadLine();
-                    if (!double.TryParse(amount, out var amountNum) || amountNum < 0)
+                    if (!double.TryParse(amount, out var amountNum) || amountNum <= 0) // if it doesn't parse as double OR is less than 0
                     {
                         Error(2, "Please enter a number greater than 0");
                         continue;
@@ -495,7 +504,7 @@ namespace BankingApp
                         Error(2, "Can't withdraw: Insufficient funds");
                         continue;
                     }
-                    // If all good
+                    // If input is validated
                     account.Withdraw(amountNum);
                     Console.Clear();
                     Success(0, "Withdrawal successful!");
@@ -527,6 +536,7 @@ namespace BankingApp
                     Success(0,"Account found!");
                     account.GenerateStatement();
                     Console.WriteLine();
+                    
                     var sendEmail = YesNoChoice("Do you want your statement emailed? (y/n): ");
                     if (sendEmail == "n") return;
 
@@ -547,6 +557,7 @@ namespace BankingApp
             }
         }
 
+        // Standard yes/no selectors most other methods leverage. returns 'y' or 'n'
         private static string YesNoChoice(string query)
         {
             Console.Write(query);
@@ -569,6 +580,7 @@ namespace BankingApp
             }
         }
 
+        // Goes a few lines down (offset from current position), writes message in RED
         private static void Error(int offset, string message)
         {
             Console.SetCursorPosition(0, Console.CursorTop + offset);
@@ -577,6 +589,7 @@ namespace BankingApp
             Console.ForegroundColor = ConsoleColor.White;
         }
 
+        // Same thing, but in GREEN :D
         private static void Success(int offset, string message)
         {
             Console.SetCursorPosition(0, Console.CursorTop + offset);
@@ -584,7 +597,7 @@ namespace BankingApp
             Console.WriteLine(message);
             Console.ForegroundColor = ConsoleColor.White;
         }
-
+    
         private static bool ValidateEmail(string email)
         {
             var emailPattern = new Regex("^.+[@]((?:outlook\\.com)|(?:gmail\\.com)|(?:uts\\.edu\\.au))$");
@@ -620,7 +633,9 @@ namespace BankingApp
                     Error(0, "WARNING: This will delete the account permanently!");
                     var delete = YesNoChoice("Do you want to delete the selected account? (y/n): ");
                     if (delete == "n") return;
+                    // Rename account file so it doesn't get loaded again. Keep it for archiving purposes
                     File.Move($"A{account.AccountNumber}.txt", $"DELETED-A{account.AccountNumber}.txt");
+                    // Delete account
                     accounts.Remove(account);
                     Console.WriteLine("The account has been successfully deleted");
                     Console.WriteLine("Press any key to continue...");

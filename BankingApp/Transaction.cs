@@ -20,7 +20,7 @@ namespace BankingApp
         public string Print()
         {
             var date = _date.ToString("dd.MM.yyyy");
-            return $"{date} | {_action} | {_amount:c2} | {_balance:c2}";
+            return $"{date} | {_action} | {_amount:c2} | {_balance:c2}"; // 'c2' = currency format, 2 decimal places
         }
 
         public string PrintEmail()

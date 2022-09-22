@@ -11,6 +11,7 @@
             _password = password;
         }
 
+        // was login successful?
         public bool Validate(string username, string password)
         {
             return username == _username && password == _password;

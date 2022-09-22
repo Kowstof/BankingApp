@@ -8,13 +8,13 @@ namespace BankingApp
     public class Account
     {
         public int AccountNumber { get; }
-        private readonly string _address;
+        public double Balance { get; private set; }
         public string Email { get; }
+        private readonly string _address;
         private readonly string _firstName;
         private readonly string _lastName;
         private readonly string _phone;
         private readonly List<Transaction> _transactions = new List<Transaction>();
-        public double Balance { get; private set; }
         
         public Account(int accountNumber, string firstName, string lastName, string address, string phone, string email,
             double balance)
@@ -27,7 +27,10 @@ namespace BankingApp
             _address = address;
             Balance = balance;
         }
-
+        
+        /* AddTransaction() is separate from Deposit() and Withdraw() so that
+         transaction records can be loaded in without affecting the balance */
+        
         public void Deposit(double amount)
         {
             var date = DateTime.Now;
@@ -52,13 +55,14 @@ namespace BankingApp
             File.AppendAllText($"A{AccountNumber}.txt",transactionText + Environment.NewLine);
             UpdateBalanceOnFile();
         }
-
+        
         public void AddTransaction(DateTime date, string action, double amount, double balance)
         {
             var newTransaction = new Transaction(date, action, amount, balance);
             _transactions.Add(newTransaction);
         }
 
+        // writes new balance to account file
         private void UpdateBalanceOnFile()
         {
             var fileLines = File.ReadAllLines($"A{AccountNumber}.txt");
@@ -66,6 +70,7 @@ namespace BankingApp
             File.WriteAllLines($"A{AccountNumber}.txt", fileLines);
         }
 
+        // summary for console printing
         public void GenerateSummary()
         {
             Console.WriteLine("╔═══════════════════════════════════════════════╗");
@@ -97,6 +102,7 @@ namespace BankingApp
             Console.SetCursorPosition(0, endCursorTop); // Reset cursor position
         }
 
+        // HTML summary for email
         public string GenerateEmailSummary()
         {
             var body = $@"
@@ -113,6 +119,7 @@ namespace BankingApp
             return body;
         }
 
+        // Full statement for console printing
         public void GenerateStatement()
         {
             GenerateSummary();
@@ -132,6 +139,7 @@ namespace BankingApp
             }
         }
 
+        // Full HTML statement for email 
         public string GenerateEmailStatement()
         {
             var summary = GenerateEmailSummary();
