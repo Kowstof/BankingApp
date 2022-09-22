@@ -6,6 +6,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Net.Mail;
+using System.Security;
 
 namespace BankingApp
 {
@@ -94,7 +95,7 @@ namespace BankingApp
                 Console.SetCursorPosition(15, 5);
                 var username = Console.ReadLine();
                 Console.SetCursorPosition(15, 6);
-                var password = Console.ReadLine();
+                var password = GetPassword();
 
                 foreach (var login in logins)
                     if (login.Validate(username, password))
@@ -107,6 +108,28 @@ namespace BankingApp
             Success(0, "Logged in!");
             Thread.Sleep(1000);
             MainMenu(accounts);
+        }
+
+        private static string GetPassword()
+        {
+            var password = "";
+            while (true)
+            {
+                var k = Console.ReadKey(true); // captured keystroke
+                if (k.Key == ConsoleKey.Enter) break; // enter submits attempt
+                if (k.Key == ConsoleKey.Backspace)
+                {
+                    if (password.Length <= 0) continue; // dont allow user to delete further backward
+                    password.Remove(password.Length - 1); // remove deleted char from password
+                    Console.Write("\b \b"); // remove deleted char from console
+                }
+                else if (k.KeyChar != '\u0000' ) // ignoring function keys
+                {
+                    password += k.KeyChar; //store the keystroke
+                    Console.Write("*"); // replace with '*'
+                }
+            }
+            return password;
         }
 
         private static void MainMenu(List<Account> accounts)
