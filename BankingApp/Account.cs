@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 
 namespace BankingApp
 {
@@ -8,7 +10,7 @@ namespace BankingApp
     {
         public int AccountNumber { get; }
         private readonly string _address;
-        private readonly string _email;
+        public string Email { get; }
         private readonly string _firstName;
         private readonly string _lastName;
         private readonly string _phone;
@@ -21,7 +23,7 @@ namespace BankingApp
             AccountNumber = accountNumber;
             _firstName = firstName;
             _lastName = lastName;
-            _email = email;
+            Email = email;
             _phone = phone;
             _address = address;
             Balance = balance;
@@ -65,7 +67,7 @@ namespace BankingApp
             File.WriteAllLines($"A{AccountNumber}.txt", fileLines);
         }
 
-        public void AccountSummary()
+        public void GenerateSummary()
         {
             Console.WriteLine("╔═══════════════════════════════════════════════╗");
             Console.WriteLine("|                 ACCOUNT DETAILS               |");
@@ -76,21 +78,80 @@ namespace BankingApp
             Console.WriteLine("|    Address:                                   |");
             Console.WriteLine("|    Phone:                                     |");
             Console.WriteLine("|    Email:                                     |");
+            Console.WriteLine("|    Balance:                                   |");
             Console.WriteLine("╚═══════════════════════════════════════════════╝");
 
             // This whole thing has to be done so the box keep its shape and alignment.
             var endCursorTop = Console.CursorTop;
-            Console.SetCursorPosition(17, endCursorTop - 6);
+            Console.SetCursorPosition(17, endCursorTop - 7);
             Console.Write(_firstName);
-            Console.SetCursorPosition(16, endCursorTop - 5);
+            Console.SetCursorPosition(16, endCursorTop - 6);
             Console.Write(_lastName);
-            Console.SetCursorPosition(14, endCursorTop - 4);
+            Console.SetCursorPosition(14, endCursorTop - 5);
             Console.Write(_address);
-            Console.SetCursorPosition(12, endCursorTop - 3);
+            Console.SetCursorPosition(12, endCursorTop - 4);
             Console.Write(_phone);
-            Console.SetCursorPosition(12, endCursorTop - 2);
-            Console.Write(_email);
+            Console.SetCursorPosition(12, endCursorTop - 3);
+            Console.Write(Email);
+            Console.SetCursorPosition(14, endCursorTop - 2);
+            Console.Write(Balance.ToString("c2")); // currency with 2 decimal places
             Console.SetCursorPosition(0, endCursorTop); // Reset cursor position
+        }
+
+        public string GenerateEmailSummary()
+        {
+            var body = $@"
+                <h3>Account Details</h3>
+                <p>Account number: {AccountNumber}</p>
+                <p>First Name: {_firstName}</p>
+                <p>Last Name: {_lastName}</p>
+                <p>Address: {_address}</p>
+                <p>Phone Number: {_phone}</p>
+                <p>Email: {Email}</p>
+                <p>Balance: {Balance:c2}</p>";
+            return body;
+        }
+
+        public void GenerateStatement()
+        {
+            GenerateSummary();
+            Console.WriteLine();
+            Console.WriteLine("Your 5 most recent transactions:");
+            var transactionsReversed = _transactions.AsEnumerable().Reverse().ToList();
+            for (var i = 0; i < 4; i++)
+            {
+                Console.WriteLine(transactionsReversed[i].Print());
+            }
+        }
+
+        public string GenerateEmailStatement()
+        {
+            var summary = GenerateEmailSummary();
+            var tables = $@"";
+            var transactionsReversed = _transactions.AsEnumerable().Reverse().ToList();
+
+            for (var i = 0; i < 4; i++)
+            {
+                tables += transactionsReversed[i].PrintEmail();
+            }
+            
+            var body = $@"
+                <h2>Your Statement</h2>
+                {summary}
+                <table>
+                <thead>
+                  <tr>
+                    <th>Date<br></th>
+                    <th>Action</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {tables}
+                </tbody>
+                </table>";
+            return body;
         }
     }
 }

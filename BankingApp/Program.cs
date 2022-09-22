@@ -162,7 +162,7 @@ namespace BankingApp
                         Withdraw(accounts);
                         break;
                     case 5:
-                        Console.WriteLine("Yeah");
+                        Statement(accounts);
                         break;
                     case 6:
                         DeleteAccount();
@@ -265,46 +265,41 @@ namespace BankingApp
                 File.WriteAllLines($"A{newAccNumber}.txt", textFileLines);
 
                 // Send confirmation email
-                var sendFrom = "krystofpavlis2@gmail.com";
-                var sendTo = email;
                 var subject = $"Account {newAccNumber} was created successfully!";
-                var body = $@"
-                    <h3>Account summary</h3>
-                    <p>Account number: {newAccNumber}</p>
-                    <p>First Name: {firstName}</p>
-                    <p>Last Name: {lastName}</p>
-                    <p>Address: {address}</p>
-                    <p>Phone Number: {phone}</p>
-                    <p>Email: {email}</p>
-                    <p>Initial Balance: $0.00</p>";
-
-                try
-                {
-                    var smtpServer = new SmtpClient("smtp.gmail.com", 587);
-                    smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
-                    var mail = new MailMessage();
-                    mail.From = new MailAddress(sendFrom);
-                    mail.To.Add(sendTo);
-                    mail.Subject = subject;
-                    mail.Body = body;
-                    mail.IsBodyHtml = true;
-                    smtpServer.Timeout = 5000;
-                    smtpServer.EnableSsl = true;
-                    smtpServer.UseDefaultCredentials = false;
-                    smtpServer.Credentials = new NetworkCredential(sendFrom, "tflnyvdwaosotdwo");
-                    smtpServer.Send(mail);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    Console.ReadKey();
-                }
-
-                Console.WriteLine(
-                    $"Account {newAccNumber} successfully created! A confirmation email has been sent.");
+                var body = newAccount.GenerateEmailSummary();
+                
+                SendEmail(email, subject, body);
+                
+                Console.WriteLine($"Account {newAccNumber} successfully created! A confirmation email has been sent.");
                 Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
                 return;
+            }
+        }
+
+        private static void SendEmail(string sendTo, string subject, string body)
+        {
+            const string sendFrom = "krystofpavlis2@gmail.com";
+            try
+            {
+                var smtpServer = new SmtpClient("smtp.gmail.com", 587);
+                smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+                var mail = new MailMessage();
+                mail.From = new MailAddress(sendFrom);
+                mail.To.Add(sendTo);
+                mail.Subject = subject;
+                mail.Body = body;
+                mail.IsBodyHtml = true;
+                smtpServer.Timeout = 5000;
+                smtpServer.EnableSsl = true;
+                smtpServer.UseDefaultCredentials = false;
+                smtpServer.Credentials = new NetworkCredential(sendFrom, "tflnyvdwaosotdwo");
+                smtpServer.Send(mail);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                Console.ReadKey();
             }
         }
 
@@ -328,7 +323,7 @@ namespace BankingApp
                 {
                     Console.Clear();
                     Success(0,"Account found!");
-                    account.AccountSummary();
+                    account.GenerateSummary();
                     var again = YesNoChoice("Find another account? (y/n): ");
                     if (again == "y") continue;
                     return;
@@ -461,6 +456,47 @@ namespace BankingApp
                     Thread.Sleep(1000);
                     return;
                 }
+            }
+        }
+
+        private static void Statement(List<Account> accounts)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                Console.WriteLine("|              GET ACCOUNT STATEMENT            |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("|    Number:                                    |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("╚═══════════════════════════════════════════════╝");
+
+                Console.SetCursorPosition(13, 5);
+                var account = SearchAccounts(accounts);
+                if (account != null) // if a matching account was found
+                {
+                    Console.Clear();
+                    Success(0,"Account found!");
+                    account.GenerateStatement();
+                    var sendEmail = YesNoChoice("Do you want your statement emailed? (y/n): ");
+                    if (sendEmail == "n") return;
+
+                    var subject = $"Statement for your account {account.AccountNumber}";
+                    var body = account.GenerateEmailStatement();
+                    
+                    SendEmail(account.Email, subject, body);
+                    Console.WriteLine($"Your statement has been successfully emailed to {account.Email}.");
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
+                    return;
+                }
+                
+                Error(3, "Account not found!");
+                var tryAgain = YesNoChoice("Find another account? (y/n): ");
+                if (tryAgain == "y") continue;
+                return;
             }
         }
 
