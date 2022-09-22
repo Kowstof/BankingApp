@@ -88,9 +88,7 @@ namespace BankingApp
                 Console.WriteLine("|    Username:                                  |");
                 Console.WriteLine("|    Password:                                  |");
                 Console.WriteLine("╚═══════════════════════════════════════════════╝");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(error);
-                Console.ForegroundColor = ConsoleColor.White;
+                Error(0, error);
 
                 Console.SetCursorPosition(15, 5);
                 var username = Console.ReadLine();
@@ -105,9 +103,7 @@ namespace BankingApp
             }
 
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Write("Logged in!");
-            Console.ForegroundColor = ConsoleColor.White;
+            Success("Logged in!");
             Thread.Sleep(1000);
             MainMenu(accounts);
         }
@@ -166,7 +162,7 @@ namespace BankingApp
                         Console.WriteLine("Yeah");
                         break;
                     case 6:
-                        Console.WriteLine("fg");
+                        DeleteAccount();
                         break;
                     case 7:
                         Exit();
@@ -212,10 +208,7 @@ namespace BankingApp
                     }
 
                     // Display Error
-                    Console.SetCursorPosition(0, 12);
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Phone number format incorrect");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Error(4, "Phone number format incorrect");
                     // Try again
                     Console.SetCursorPosition(0, 8);
                     Console.Write("|    Phone:                                     |");
@@ -237,10 +230,7 @@ namespace BankingApp
                     }
 
                     // Display Error
-                    Console.SetCursorPosition(0, 12);
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Email format incorrect");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Error(3, "Incorrect email format");
                     // Try again
                     Console.SetCursorPosition(0, 9);
                     Console.Write("|    Email:                                     |");
@@ -326,6 +316,7 @@ namespace BankingApp
                 Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
                 Console.WriteLine("|                                               |");
                 Console.WriteLine("|    Number:                                    |");
+                Console.WriteLine("|                                               |");
                 Console.WriteLine("╚═══════════════════════════════════════════════╝");
 
                 Console.SetCursorPosition(13, 5);
@@ -333,19 +324,14 @@ namespace BankingApp
                 if (account != null) // if a matching account was found
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("Account found!");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Success("Account found!");
                     account.AccountSummary();
                     var again = YesNoChoice("Find another account? (y/n): ");
                     if (again == "y") continue;
                     return;
                 }
 
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine();
-                Console.WriteLine("Account not found!");
-                Console.ForegroundColor = ConsoleColor.White;
+                Error(0, "Account not found!");
                 var tryAgain = YesNoChoice("Find another account? (y/n): ");
                 if (tryAgain == "y") continue;
                 return;
@@ -366,20 +352,58 @@ namespace BankingApp
                     Console.Write(new string(' ', Console.WindowWidth)); // clear any error messages
                     var queryNum = Convert.ToInt32(query); // after regex check we can assume it will parse
                     foreach (var account in accounts)
-                        return queryNum == account.AccountNumber
-                            ? account
-                            : null; // return either the found account or null
+                        return queryNum == account.AccountNumber ? account : null; // return either the found account or null
                 }
 
                 // If incorrect format
                 Console.SetCursorPosition(initialCursorLeft, initialCursorTop);
-                Console.Write(new string(' ',
-                    Console.WindowWidth -
-                    initialCursorLeft)); // Fills in rest of line with blank spaces without spilling to next line
-                Console.SetCursorPosition(0, initialCursorTop + 3); // Put the cursor below the box
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Incorrect account number format");
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(new string(' ', Console.WindowWidth - initialCursorLeft)); // Fills in rest of line with blank spaces without spilling to next line
+                Error(3, "Incorrect number format");
+            }
+        }
+
+        private static void Deposit(List<Account> accounts)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                Console.WriteLine("|                    DEPOSIT                    |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("|    Number:                                    |");
+                Console.WriteLine("|    Amount: $                                  |");
+                Console.WriteLine("╚═══════════════════════════════════════════════╝");
+                Console.SetCursorPosition(13, 5);
+                var account = SearchAccounts(accounts);
+                // If no matching account is found
+                if (account == null)
+                {
+                    Error(3, "Account not found");
+                    var choice = YesNoChoice("Find another account? (y/n): ");
+                    if (choice == "y") continue;
+                    return;
+                }
+                // If an account is found
+                while (true)
+                {
+                    Console.SetCursorPosition(0, 6);
+                    Console.Write("|    Number: $                                  |");
+                    Console.SetCursorPosition(14, 6);
+                    var amount = Console.ReadLine();
+                    if (!double.TryParse(amount, out var amountNum) || amountNum < 0)
+                    {
+                        Error(2, "Please enter a number greater than 0");
+                        continue;
+                    }
+                    // If all good
+                    account.Deposit(amountNum);
+                    Console.Clear();
+                    Success("Deposit successful!");
+                    Thread.Sleep(1000);
+                    return;
+                }
             }
         }
 
@@ -397,15 +421,27 @@ namespace BankingApp
                     return choice;
                 }
 
-                Console.SetCursorPosition(0, tempCursorTop + 1);
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Please type 'y' or 'n'");
-                Console.ForegroundColor = ConsoleColor.White;
+                Error(1, "Please type 'y' or 'n'");
                 Console.SetCursorPosition(0, tempCursorTop);
                 Console.Write(new string(' ', Console.WindowWidth));
                 Console.SetCursorPosition(0, tempCursorTop);
                 Console.Write(query);
             }
+        }
+
+        private static void Error(int offset, string message)
+        {
+            Console.SetCursorPosition(0, Console.CursorTop + offset);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+
+        private static void Success(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(message);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         private static bool ValidateEmail(string email)
@@ -429,6 +465,7 @@ namespace BankingApp
             Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
             Console.WriteLine("|                                               |");
             Console.WriteLine("|    Number:                                    |");
+            Console.WriteLine("|                                               |");
             Console.WriteLine("╚═══════════════════════════════════════════════╝");
         }
 

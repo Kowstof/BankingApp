@@ -29,14 +29,27 @@ namespace BankingApp
             _balance = balance;
         }
 
+        public void Deposit(double amount)
+        {
+            var balance = _balance + amount;
+            AddTransaction(DateTime.Now, "Deposit", amount, balance);
+        }
+        
+        public void Withdraw(double amount)
+        {
+            var balance = _balance - amount;
+            AddTransaction(DateTime.Now, "Withdraw", amount, balance);
+        }
+
         public void AddTransaction(DateTime date, string action, double amount, double balance)
         {
-            var newTransaction = new Transaction(date, action, amount, balance);
-            _transactions.Add(newTransaction);
             if (action == "Deposit")
                 _balance += amount;
             else
                 _balance -= amount;
+            
+            var newTransaction = new Transaction(date, action, amount, balance);
+            _transactions.Add(newTransaction);
 
             var transactionText = $"{date}|{action}|{amount}|{balance}";
             File.AppendAllText($"A{AccountNumber}.txt", transactionText + Environment.NewLine);
