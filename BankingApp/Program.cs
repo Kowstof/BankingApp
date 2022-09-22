@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -103,7 +104,7 @@ namespace BankingApp
             }
 
             Console.Clear();
-            Success("Logged in!");
+            Success(0, "Logged in!");
             Thread.Sleep(1000);
             MainMenu(accounts);
         }
@@ -138,10 +139,12 @@ namespace BankingApp
 
                     Console.SetCursorPosition(24, 11);
                     choice = Console.ReadLine();
-                    if (choice != null && Regex.IsMatch(choice, "[1-7]"))
+                    if (choice != null && Regex.IsMatch(choice, "^[1-7]$"))
                         valid = true;
                     else
                         error = "Please enter a selection between 1 and 7";
+                  
+
                 }
 
                 switch (Convert.ToInt32(choice))
@@ -153,7 +156,7 @@ namespace BankingApp
                         FindAccount(accounts);
                         break;
                     case 3:
-                        Console.WriteLine("Yeah");
+                        Deposit(accounts);
                         break;
                     case 4:
                         Console.WriteLine("fg");
@@ -324,14 +327,14 @@ namespace BankingApp
                 if (account != null) // if a matching account was found
                 {
                     Console.Clear();
-                    Success("Account found!");
+                    Success(0,"Account found!");
                     account.AccountSummary();
                     var again = YesNoChoice("Find another account? (y/n): ");
                     if (again == "y") continue;
                     return;
                 }
-
-                Error(0, "Account not found!");
+                
+                Error(3, "Account not found!");
                 var tryAgain = YesNoChoice("Find another account? (y/n): ");
                 if (tryAgain == "y") continue;
                 return;
@@ -341,23 +344,24 @@ namespace BankingApp
 
         private static Account SearchAccounts(List<Account> accounts)
         {
+            var initialCursorTop = Console.CursorTop;
+            var initialCursorLeft = Console.CursorLeft;
             while (true)
             {
-                var initialCursorTop = Console.CursorTop;
-                var initialCursorLeft = Console.CursorLeft;
+                Console.SetCursorPosition(initialCursorLeft, initialCursorTop);
                 var query = Console.ReadLine();
                 if (query != null && Regex.IsMatch(query, "[0-9]{6}")) // If the input is 6 numbers...
                 {
                     Console.SetCursorPosition(0, initialCursorTop + 3);
                     Console.Write(new string(' ', Console.WindowWidth)); // clear any error messages
+                    Console.SetCursorPosition(initialCursorLeft, initialCursorTop);
                     var queryNum = Convert.ToInt32(query); // after regex check we can assume it will parse
-                    foreach (var account in accounts)
-                        return queryNum == account.AccountNumber ? account : null; // return either the found account or null
+                    return accounts.FirstOrDefault(account => queryNum == account.AccountNumber);
                 }
 
                 // If incorrect format
-                Console.SetCursorPosition(initialCursorLeft, initialCursorTop);
-                Console.Write(new string(' ', Console.WindowWidth - initialCursorLeft)); // Fills in rest of line with blank spaces without spilling to next line
+                Console.SetCursorPosition(0, initialCursorTop);
+                Console.Write("|    Number:                                    |"); // Fills in rest of line with blank spaces without spilling to next line
                 Error(3, "Incorrect number format");
             }
         }
@@ -386,10 +390,11 @@ namespace BankingApp
                     return;
                 }
                 // If an account is found
+                Success(3, "Account found! Please enter amount to deposit");
                 while (true)
                 {
                     Console.SetCursorPosition(0, 6);
-                    Console.Write("|    Number: $                                  |");
+                    Console.Write("|    Amount: $                                  |");
                     Console.SetCursorPosition(14, 6);
                     var amount = Console.ReadLine();
                     if (!double.TryParse(amount, out var amountNum) || amountNum < 0)
@@ -400,7 +405,53 @@ namespace BankingApp
                     // If all good
                     account.Deposit(amountNum);
                     Console.Clear();
-                    Success("Deposit successful!");
+                    Success(0, "Deposit successful!");
+                    Thread.Sleep(1000);
+                    return;
+                }
+            }
+        }
+        
+        private static void Withdraw(List<Account> accounts)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                Console.WriteLine("|                     WITHDRAW                  |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("|    Number:                                    |");
+                Console.WriteLine("|    Amount: $                                  |");
+                Console.WriteLine("╚═══════════════════════════════════════════════╝");
+                Console.SetCursorPosition(13, 5);
+                var account = SearchAccounts(accounts);
+                // If no matching account is found
+                if (account == null)
+                {
+                    Error(3, "Account not found");
+                    var choice = YesNoChoice("Find another account? (y/n): ");
+                    if (choice == "y") continue;
+                    return;
+                }
+                // If an account is found
+                Success(3, "Account found! Please enter amount to withdraw");
+                while (true)
+                {
+                    Console.SetCursorPosition(0, 6);
+                    Console.Write("|    Amount: $                                  |");
+                    Console.SetCursorPosition(14, 6);
+                    var amount = Console.ReadLine();
+                    if (!double.TryParse(amount, out var amountNum) || amountNum < 0)
+                    {
+                        Error(2, "Please enter a number greater than 0");
+                        continue;
+                    }
+                    // If all good
+                    account.Deposit(amountNum);
+                    Console.Clear();
+                    Success(0, "Withdrawal successful!");
                     Thread.Sleep(1000);
                     return;
                 }
@@ -437,8 +488,9 @@ namespace BankingApp
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        private static void Success(string message)
+        private static void Success(int offset, string message)
         {
+            Console.SetCursorPosition(0, Console.CursorTop + offset);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(message);
             Console.ForegroundColor = ConsoleColor.White;
@@ -472,6 +524,7 @@ namespace BankingApp
         private static void Exit()
         {
             Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Thank you for using Krystof's banking system! Exiting...");
             Thread.Sleep(1500);
             Environment.Exit(1);

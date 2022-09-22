@@ -31,28 +31,40 @@ namespace BankingApp
 
         public void Deposit(double amount)
         {
-            var balance = _balance + amount;
-            AddTransaction(DateTime.Now, "Deposit", amount, balance);
+            var date = DateTime.Now;
+            var action = "Deposit";
+            _balance += amount;
+            AddTransaction(date, action, amount, _balance);
+            
+            var transactionText = $"{date:dd.MM.yyyy}|{action}|{amount}|{_balance}";
+            File.AppendAllText($"A{AccountNumber}.txt", transactionText + Environment.NewLine);
+            UpdateBalanceOnFile();
         }
         
         public void Withdraw(double amount)
         {
-            var balance = _balance - amount;
-            AddTransaction(DateTime.Now, "Withdraw", amount, balance);
+            var date = DateTime.Now;
+            const string action = "Withdraw";
+            _balance -= amount;
+            
+            AddTransaction(date, action, amount, _balance);
+            
+            var transactionText = $"{date:dd.MM.yyyy}|{action}|{amount}|{_balance}";
+            File.AppendAllText($"A{AccountNumber}.txt", Environment.NewLine + transactionText);
+            UpdateBalanceOnFile();
         }
 
         public void AddTransaction(DateTime date, string action, double amount, double balance)
         {
-            if (action == "Deposit")
-                _balance += amount;
-            else
-                _balance -= amount;
-            
             var newTransaction = new Transaction(date, action, amount, balance);
             _transactions.Add(newTransaction);
+        }
 
-            var transactionText = $"{date}|{action}|{amount}|{balance}";
-            File.AppendAllText($"A{AccountNumber}.txt", transactionText + Environment.NewLine);
+        public void UpdateBalanceOnFile()
+        {
+            var fileLines = File.ReadAllLines($"A{AccountNumber}.txt");
+            fileLines[6] = $"Balance|{_balance}";
+            File.WriteAllLines($"A{AccountNumber}.txt", fileLines);
         }
 
         public void AccountSummary()
