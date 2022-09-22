@@ -159,7 +159,7 @@ namespace BankingApp
                         Deposit(accounts);
                         break;
                     case 4:
-                        Console.WriteLine("fg");
+                        Withdraw(accounts);
                         break;
                     case 5:
                         Console.WriteLine("Yeah");

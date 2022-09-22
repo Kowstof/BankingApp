@@ -48,7 +48,7 @@ namespace BankingApp
             AddTransaction(date, action, amount, Balance);
             
             var transactionText = $"{date:dd.MM.yyyy}|{action}|{amount}|{Balance}";
-            File.AppendAllText($"A{AccountNumber}.txt", Environment.NewLine + transactionText);
+            File.AppendAllText($"A{AccountNumber}.txt",transactionText + Environment.NewLine);
             UpdateBalanceOnFile();
         }
 
