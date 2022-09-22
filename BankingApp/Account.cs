@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
@@ -7,7 +6,6 @@ namespace BankingApp
 {
     public class Account
     {
-        //private readonly int _accountNumber;
         public int AccountNumber { get; }
         private readonly string _address;
         private readonly string _email;
@@ -15,8 +13,8 @@ namespace BankingApp
         private readonly string _lastName;
         private readonly string _phone;
         private List<Transaction> _transactions = new List<Transaction>();
-        private double _balance;
-
+        public double Balance { get; private set; }
+        
         public Account(int accountNumber, string firstName, string lastName, string address, string phone, string email,
             double balance)
         {
@@ -26,17 +24,17 @@ namespace BankingApp
             _email = email;
             _phone = phone;
             _address = address;
-            _balance = balance;
+            Balance = balance;
         }
 
         public void Deposit(double amount)
         {
             var date = DateTime.Now;
             var action = "Deposit";
-            _balance += amount;
-            AddTransaction(date, action, amount, _balance);
+            Balance += amount;
+            AddTransaction(date, action, amount, Balance);
             
-            var transactionText = $"{date:dd.MM.yyyy}|{action}|{amount}|{_balance}";
+            var transactionText = $"{date:dd.MM.yyyy}|{action}|{amount}|{Balance}";
             File.AppendAllText($"A{AccountNumber}.txt", transactionText + Environment.NewLine);
             UpdateBalanceOnFile();
         }
@@ -45,11 +43,11 @@ namespace BankingApp
         {
             var date = DateTime.Now;
             const string action = "Withdraw";
-            _balance -= amount;
+            Balance -= amount;
             
-            AddTransaction(date, action, amount, _balance);
+            AddTransaction(date, action, amount, Balance);
             
-            var transactionText = $"{date:dd.MM.yyyy}|{action}|{amount}|{_balance}";
+            var transactionText = $"{date:dd.MM.yyyy}|{action}|{amount}|{Balance}";
             File.AppendAllText($"A{AccountNumber}.txt", Environment.NewLine + transactionText);
             UpdateBalanceOnFile();
         }
@@ -60,10 +58,10 @@ namespace BankingApp
             _transactions.Add(newTransaction);
         }
 
-        public void UpdateBalanceOnFile()
+        private void UpdateBalanceOnFile()
         {
             var fileLines = File.ReadAllLines($"A{AccountNumber}.txt");
-            fileLines[6] = $"Balance|{_balance}";
+            fileLines[6] = $"Balance|{Balance}";
             File.WriteAllLines($"A{AccountNumber}.txt", fileLines);
         }
 

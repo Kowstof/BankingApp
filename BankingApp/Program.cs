@@ -448,8 +448,14 @@ namespace BankingApp
                         Error(2, "Please enter a number greater than 0");
                         continue;
                     }
+
+                    if (amountNum > account.Balance)
+                    {
+                        Error(2, "Can't withdraw: Insufficient funds");
+                        continue;
+                    }
                     // If all good
-                    account.Deposit(amountNum);
+                    account.Withdraw(amountNum);
                     Console.Clear();
                     Success(0, "Withdrawal successful!");
                     Thread.Sleep(1000);
