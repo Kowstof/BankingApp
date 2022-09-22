@@ -616,11 +616,15 @@ namespace BankingApp
                 if (account != null) // if a matching account was found
                 {
                     
-                    Success(0,"Account found!");
+                    Success(3,"Account found!");
                     Error(0, "WARNING: This will delete the account permanently!");
-                    var again = YesNoChoice("Do you want to delete the selected account? (y/n): ");
-                    if (again == "n") continue;
+                    var delete = YesNoChoice("Do you want to delete the selected account? (y/n): ");
+                    if (delete == "n") return;
+                    File.Move($"A{account.AccountNumber}.txt", $"DELETED-A{account.AccountNumber}.txt");
                     accounts.Remove(account);
+                    Console.WriteLine("The account has been successfully deleted");
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
                     return;
                 }
                 
@@ -637,7 +641,7 @@ namespace BankingApp
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Thank you for using Krystof's banking system! Exiting...");
             Thread.Sleep(1500);
-            Environment.Exit(1);
+            Environment.Exit(0);
         }
     }
 }

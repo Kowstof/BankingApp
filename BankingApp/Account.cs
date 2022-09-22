@@ -159,10 +159,5 @@ namespace BankingApp
                 </table>";
             return body;
         }
-
-        ~Account()
-        {
-            File.Move($"A{AccountNumber}.txt", $"DELETED-A{AccountNumber}.txt");
-        }
     }
 }
