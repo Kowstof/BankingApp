@@ -58,17 +58,17 @@ namespace BankingApp
                 var loadedAccount = new Account(accountId, firstName, lastName, address, phone, email, balance);
 
                 // Process and convert transaction lines
-                for (int i = 7; i < allLines.Length; i++)
+                for (var i = 7; i < allLines.Length; i++)
                 {
                     var transactionData = allLines[i].Split('|');
                     var date = DateTime.ParseExact(transactionData[0], "dd.MM.yyyy", null);
                     var action = transactionData[1];
                     var amount = Convert.ToDouble(transactionData[2]);
                     var balanceRecord = Convert.ToDouble(transactionData[3]);
-                    
+
                     loadedAccount.AddTransaction(date, action, amount, balanceRecord);
                 }
-                
+
                 accounts.Add(loadedAccount);
             }
         }
@@ -114,206 +114,210 @@ namespace BankingApp
 
         private static void MainMenu(List<Account> accounts)
         {
-            var valid = false;
-            var error = "";
-            var choice = "";
-
-            while (!valid)
+            while (true)
             {
-                Console.Clear();
-                Console.WriteLine("╔═══════════════════════════════════════════════╗");
-                Console.WriteLine("|        WELCOME TO SIMPLE BANKING SYSTEM       |");
-                Console.WriteLine("|═══════════════════════════════════════════════|");
-                Console.WriteLine("|    1. Create a new account                    |");
-                Console.WriteLine("|    2. Search for an account                   |");
-                Console.WriteLine("|    3. Deposit                                 |");
-                Console.WriteLine("|    4. Withdraw                                |");
-                Console.WriteLine("|    5. Account statement                       |");
-                Console.WriteLine("|    6. Delete account                          |");
-                Console.WriteLine("|    7. Exit                                    |");
-                Console.WriteLine("|═══════════════════════════════════════════════|");
-                Console.WriteLine("|    Enter your choice:                         |");
-                Console.WriteLine("╚═══════════════════════════════════════════════╝");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(error);
-                Console.ForegroundColor = ConsoleColor.White;
+                var valid = false;
+                var error = "";
+                var choice = "";
 
-                Console.SetCursorPosition(24, 11);
-                choice = Console.ReadLine();
-                if (choice != null && Regex.IsMatch(choice, "[1-7]"))
-                    valid = true;
-                else
-                    error = "Please enter a selection between 1 and 7";
-            }
+                while (!valid)
+                {
+                    Console.Clear();
+                    Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                    Console.WriteLine("|        WELCOME TO SIMPLE BANKING SYSTEM       |");
+                    Console.WriteLine("|═══════════════════════════════════════════════|");
+                    Console.WriteLine("|    1. Create a new account                    |");
+                    Console.WriteLine("|    2. Search for an account                   |");
+                    Console.WriteLine("|    3. Deposit                                 |");
+                    Console.WriteLine("|    4. Withdraw                                |");
+                    Console.WriteLine("|    5. Account statement                       |");
+                    Console.WriteLine("|    6. Delete account                          |");
+                    Console.WriteLine("|    7. Exit                                    |");
+                    Console.WriteLine("|═══════════════════════════════════════════════|");
+                    Console.WriteLine("|    Enter your choice:                         |");
+                    Console.WriteLine("╚═══════════════════════════════════════════════╝");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine(error);
+                    Console.ForegroundColor = ConsoleColor.White;
 
-            switch (Convert.ToInt32(choice))
-            {
-                case 1:
-                    CreateAccount(accounts);
-                    break;
-                case 2:
-                    SearchAccount(accounts);
-                    break;
-                case 3:
-                    Console.WriteLine("Yeah");
-                    break;
-                case 4:
-                    Console.WriteLine("fg");
-                    break;
-                case 5:
-                    Console.WriteLine("Yeah");
-                    break;
-                case 6:
-                    Console.WriteLine("fg");
-                    break;
-                case 7:
-                    Exit();
-                    break;
+                    Console.SetCursorPosition(24, 11);
+                    choice = Console.ReadLine();
+                    if (choice != null && Regex.IsMatch(choice, "[1-7]"))
+                        valid = true;
+                    else
+                        error = "Please enter a selection between 1 and 7";
+                }
+
+                switch (Convert.ToInt32(choice))
+                {
+                    case 1:
+                        CreateAccount(accounts);
+                        break;
+                    case 2:
+                        FindAccount(accounts);
+                        break;
+                    case 3:
+                        Console.WriteLine("Yeah");
+                        break;
+                    case 4:
+                        Console.WriteLine("fg");
+                        break;
+                    case 5:
+                        Console.WriteLine("Yeah");
+                        break;
+                    case 6:
+                        Console.WriteLine("fg");
+                        break;
+                    case 7:
+                        Exit();
+                        break;
+                }
             }
         }
 
         private static void CreateAccount(List<Account> accounts)
         {
-            Console.Clear();
-            Console.WriteLine("╔═══════════════════════════════════════════════╗");
-            Console.WriteLine("|              CREATE A NEW ACCOUNT             |");
-            Console.WriteLine("|═══════════════════════════════════════════════|");
-            Console.WriteLine("|              ENTER ACCOUNT DETAILS            |");
-            Console.WriteLine("|                                               |");
-            Console.WriteLine("|    First Name:                                |");
-            Console.WriteLine("|    Last Name:                                 |");
-            Console.WriteLine("|    Address:                                   |");
-            Console.WriteLine("|    Phone:                                     |");
-            Console.WriteLine("|    Email:                                     |");
-            Console.WriteLine("╚═══════════════════════════════════════════════╝");
-
-            Console.SetCursorPosition(17, 5);
-            var firstName = Console.ReadLine();
-            Console.SetCursorPosition(16, 6);
-            var lastName = Console.ReadLine();
-            Console.SetCursorPosition(14, 7);
-            var address = Console.ReadLine();
-            Console.SetCursorPosition(12, 8);
-            var phone = Console.ReadLine();
-
             while (true)
             {
-                // Move on if all good
-                if (ValidatePhone(phone))
-                {
-                    Console.SetCursorPosition(0, 12);
-                    Console.Write(new string(' ', Console.WindowWidth)); // Clear Error Message
-                    break;
-                }
+                Console.Clear();
+                Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                Console.WriteLine("|              CREATE A NEW ACCOUNT             |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|              ENTER ACCOUNT DETAILS            |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("|    First Name:                                |");
+                Console.WriteLine("|    Last Name:                                 |");
+                Console.WriteLine("|    Address:                                   |");
+                Console.WriteLine("|    Phone:                                     |");
+                Console.WriteLine("|    Email:                                     |");
+                Console.WriteLine("╚═══════════════════════════════════════════════╝");
 
-                // Display Error
-                Console.SetCursorPosition(0, 12);
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Phone number format incorrect");
-                Console.ForegroundColor = ConsoleColor.White;
-                // Try again
-                Console.SetCursorPosition(0, 8);
-                Console.Write("|    Phone:                                     |");
+                Console.SetCursorPosition(17, 5);
+                var firstName = Console.ReadLine();
+                Console.SetCursorPosition(16, 6);
+                var lastName = Console.ReadLine();
+                Console.SetCursorPosition(14, 7);
+                var address = Console.ReadLine();
                 Console.SetCursorPosition(12, 8);
-                phone = Console.ReadLine();
-            }
+                var phone = Console.ReadLine();
 
-            Console.SetCursorPosition(12, 9);
-            var email = Console.ReadLine();
-
-            while (true)
-            {
-                // Move on if all good
-                if (ValidateEmail(email))
+                while (true)
                 {
+                    // Move on if all good
+                    if (ValidatePhone(phone))
+                    {
+                        Console.SetCursorPosition(0, 12);
+                        Console.Write(new string(' ', Console.WindowWidth)); // Clear Error Message
+                        break;
+                    }
+
+                    // Display Error
                     Console.SetCursorPosition(0, 12);
-                    Console.Write(new string(' ', Console.WindowWidth)); // Clear Error Message
-                    break;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Phone number format incorrect");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    // Try again
+                    Console.SetCursorPosition(0, 8);
+                    Console.Write("|    Phone:                                     |");
+                    Console.SetCursorPosition(12, 8);
+                    phone = Console.ReadLine();
                 }
 
-                // Display Error
-                Console.SetCursorPosition(0, 12);
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Email format incorrect");
-                Console.ForegroundColor = ConsoleColor.White;
-                // Try again
-                Console.SetCursorPosition(0, 9);
-                Console.Write("|    Email:                                     |");
                 Console.SetCursorPosition(12, 9);
-                email = Console.ReadLine();
-            }
+                var email = Console.ReadLine();
 
-            var choice = YesNoChoice("Is the information correct? (y/n): ");
-            if (choice == "n")
-                CreateAccount(accounts);
+                while (true)
+                {
+                    // Move on if all good
+                    if (ValidateEmail(email))
+                    {
+                        Console.SetCursorPosition(0, 12);
+                        Console.Write(new string(' ', Console.WindowWidth)); // Clear Error Message
+                        break;
+                    }
 
-            // Create the new account
-            var numAccounts = accounts.Count;
-            var latest = accounts[numAccounts - 1].AccountNumber;
-            var newAccNumber = latest + 1;
-            var newAccount = new Account(newAccNumber, firstName, lastName, address, phone, email, 0.0);
-            accounts.Add(newAccount);
+                    // Display Error
+                    Console.SetCursorPosition(0, 12);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Email format incorrect");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    // Try again
+                    Console.SetCursorPosition(0, 9);
+                    Console.Write("|    Email:                                     |");
+                    Console.SetCursorPosition(12, 9);
+                    email = Console.ReadLine();
+                }
 
-            // Write new account file
-            string[] textFileLines =
-            {
-                $"AccountNo|{newAccNumber}",
-                $"First Name|{firstName}",
-                $"Last Name|{lastName}",
-                $"Address|{address}",
-                $"Phone|{phone}",
-                $"Email|{email}",
-                "Balance|0"
-            };
-            File.WriteAllLines($"A{newAccNumber}.txt", textFileLines);
+                var choice = YesNoChoice("Is the information correct? (y/n): ");
+                if (choice == "n") continue;
+                
+                // Create the new account
+                var numAccounts = accounts.Count;
+                var latest = accounts[numAccounts - 1].AccountNumber;
+                var newAccNumber = latest + 1;
+                var newAccount = new Account(newAccNumber, firstName, lastName, address, phone, email, 0.0);
+                accounts.Add(newAccount);
 
-            // Send confirmation email
-            var sendFrom = "krystofpavlis2@gmail.com";
-            var sendTo = email;
-            var subject = $"Account {newAccNumber} was created successfully!";
-            var body = $@"
-            <h3>Account summary</h3>
-            <p>Account number: {newAccNumber}</p>
-            <p>First Name: {firstName}</p>
-            <p>Last Name: {lastName}</p>
-            <p>Address: {address}</p>
-            <p>Phone Number: {phone}</p>
-            <p>Email: {email}</p>
-            <p>Initial Balance: $0.00</p>";
+                // Write new account file
+                string[] textFileLines =
+                {
+                    $"AccountNo|{newAccNumber}",
+                    $"First Name|{firstName}",
+                    $"Last Name|{lastName}",
+                    $"Address|{address}",
+                    $"Phone|{phone}",
+                    $"Email|{email}",
+                    "Balance|0"
+                };
+                File.WriteAllLines($"A{newAccNumber}.txt", textFileLines);
 
-            try
-            {
-                var smtpServer = new SmtpClient("smtp.gmail.com", 587);
-                smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
-                var mail = new MailMessage();
-                mail.From = new MailAddress(sendFrom);
-                mail.To.Add(sendTo);
-                mail.Subject = subject;
-                mail.Body = body;
-                mail.IsBodyHtml = true;
-                smtpServer.Timeout = 5000;
-                smtpServer.EnableSsl = true;
-                smtpServer.UseDefaultCredentials = false;
-                smtpServer.Credentials = new NetworkCredential(sendFrom, "tflnyvdwaosotdwo");
-                smtpServer.Send(mail);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
+                // Send confirmation email
+                var sendFrom = "krystofpavlis2@gmail.com";
+                var sendTo = email;
+                var subject = $"Account {newAccNumber} was created successfully!";
+                var body = $@"
+                    <h3>Account summary</h3>
+                    <p>Account number: {newAccNumber}</p>
+                    <p>First Name: {firstName}</p>
+                    <p>Last Name: {lastName}</p>
+                    <p>Address: {address}</p>
+                    <p>Phone Number: {phone}</p>
+                    <p>Email: {email}</p>
+                    <p>Initial Balance: $0.00</p>";
+
+                try
+                {
+                    var smtpServer = new SmtpClient("smtp.gmail.com", 587);
+                    smtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    var mail = new MailMessage();
+                    mail.From = new MailAddress(sendFrom);
+                    mail.To.Add(sendTo);
+                    mail.Subject = subject;
+                    mail.Body = body;
+                    mail.IsBodyHtml = true;
+                    smtpServer.Timeout = 5000;
+                    smtpServer.EnableSsl = true;
+                    smtpServer.UseDefaultCredentials = false;
+                    smtpServer.Credentials = new NetworkCredential(sendFrom, "tflnyvdwaosotdwo");
+                    smtpServer.Send(mail);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                    Console.ReadKey();
+                }
+
+                Console.WriteLine(
+                    $"Account {newAccNumber} successfully created! A confirmation email has been sent.");
+                Console.WriteLine("Press any key to continue...");
                 Console.ReadKey();
+                return;
             }
-
-            Console.WriteLine($"Account {newAccNumber} successfully created! A confirmation email has been sent.");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
-            MainMenu(accounts);
         }
 
-        public static void SearchAccount(List<Account> accounts)
+        private static void FindAccount(List<Account> accounts)
         {
-            var valid = false;
-            var error = "";
-            while (!valid)
+            while (true)
             {
                 Console.Clear();
                 Console.WriteLine("╔═══════════════════════════════════════════════╗");
@@ -324,40 +328,58 @@ namespace BankingApp
                 Console.WriteLine("|    Number:                                    |");
                 Console.WriteLine("╚═══════════════════════════════════════════════╝");
 
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine(error);
-                Console.ForegroundColor = ConsoleColor.White;
-
                 Console.SetCursorPosition(13, 5);
+                var account = SearchAccounts(accounts);
+                if (account != null) // if a matching account was found
+                {
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Account found!");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    account.AccountSummary();
+                    var again = YesNoChoice("Find another account? (y/n): ");
+                    if (again == "y") continue;
+                    return;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine();
+                Console.WriteLine("Account not found!");
+                Console.ForegroundColor = ConsoleColor.White;
+                var tryAgain = YesNoChoice("Find another account? (y/n): ");
+                if (tryAgain == "y") continue;
+                return;
+            }
+        }
+
+
+        private static Account SearchAccounts(List<Account> accounts)
+        {
+            while (true)
+            {
+                var initialCursorTop = Console.CursorTop;
+                var initialCursorLeft = Console.CursorLeft;
                 var query = Console.ReadLine();
                 if (query != null && Regex.IsMatch(query, "[0-9]{6}")) // If the input is 6 numbers...
                 {
-                    var queryNum = Convert.ToInt32(query);
-                    foreach (var account in accounts) // For each account...
-                        if (queryNum == account.AccountNumber) // Check if searched number matches
-                        {
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Clear();
-                            Console.WriteLine("Account found!");
-                            Console.ForegroundColor = ConsoleColor.White;
-                            account.AccountSummary();
-                            var again = YesNoChoice("Find another account? (y/n): ");
-                            if (again == "y")
-                                SearchAccount(accounts);
-                            MainMenu(accounts);
-                        }
-
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine();
-                    Console.WriteLine("Account not found!");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    var tryAgain = YesNoChoice("Find another account? (y/n): ");
-                    if (tryAgain == "y")
-                        SearchAccount(accounts);
-                    MainMenu(accounts);
+                    Console.SetCursorPosition(0, initialCursorTop + 3);
+                    Console.Write(new string(' ', Console.WindowWidth)); // clear any error messages
+                    var queryNum = Convert.ToInt32(query); // after regex check we can assume it will parse
+                    foreach (var account in accounts)
+                        return queryNum == account.AccountNumber
+                            ? account
+                            : null; // return either the found account or null
                 }
 
-                error = "Incorrect account number format";
+                // If incorrect format
+                Console.SetCursorPosition(initialCursorLeft, initialCursorTop);
+                Console.Write(new string(' ',
+                    Console.WindowWidth -
+                    initialCursorLeft)); // Fills in rest of line with blank spaces without spilling to next line
+                Console.SetCursorPosition(0, initialCursorTop + 3); // Put the cursor below the box
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Incorrect account number format");
+                Console.ForegroundColor = ConsoleColor.White;
             }
         }
 
@@ -365,7 +387,6 @@ namespace BankingApp
         {
             Console.Write(query);
             var tempCursorTop = Console.CursorTop;
-            var tempCursorLeft = Console.CursorLeft;
             while (true)
             {
                 var choice = Console.ReadLine();
@@ -414,7 +435,7 @@ namespace BankingApp
         private static void Exit()
         {
             Console.Clear();
-            Console.WriteLine("Thank you for using simple banking system! Closing...");
+            Console.WriteLine("Thank you for using Krystof's banking system! Exiting...");
             Thread.Sleep(1500);
             Environment.Exit(1);
         }

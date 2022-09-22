@@ -3,7 +3,7 @@
 namespace BankingApp
 {
     public struct Transaction
-    {           
+    {
         private DateTime _date;
         private string _action;
         private double _amount;
