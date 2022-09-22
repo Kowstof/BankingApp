@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -14,7 +13,7 @@ namespace BankingApp
         private readonly string _firstName;
         private readonly string _lastName;
         private readonly string _phone;
-        private List<Transaction> _transactions = new List<Transaction>();
+        private readonly List<Transaction> _transactions = new List<Transaction>();
         public double Balance { get; private set; }
         
         public Account(int accountNumber, string firstName, string lastName, string address, string phone, string email,
@@ -32,7 +31,7 @@ namespace BankingApp
         public void Deposit(double amount)
         {
             var date = DateTime.Now;
-            var action = "Deposit";
+            const string action = "Deposit";
             Balance += amount;
             AddTransaction(date, action, amount, Balance);
             
@@ -159,6 +158,11 @@ namespace BankingApp
                 </tbody>
                 </table>";
             return body;
+        }
+
+        ~Account()
+        {
+            File.Move($"A{AccountNumber}.txt", $"DELETED-A{AccountNumber}.txt");
         }
     }
 }

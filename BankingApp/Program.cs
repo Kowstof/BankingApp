@@ -6,7 +6,6 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Net.Mail;
-using System.Security;
 
 namespace BankingApp
 {
@@ -17,23 +16,37 @@ namespace BankingApp
             var logins = new List<Login>();
             var accounts = new List<Account>();
 
-            LoadLogins(logins);
-            LoadAccounts(accounts);
-            Login(logins, accounts);
+            LoadLogins(logins, accounts);
+            Exit();
         }
 
-        private static void LoadLogins(List<Login> logins)
+        private static void LoadLogins(List<Login> logins, List<Account> accounts)
         {
-            var entries = File.ReadAllLines("login.txt");
-            foreach (var entry in entries)
+            try
             {
-                var credentials = entry.Split('|');
-                var newLogin = new Login(credentials[0], credentials[1]);
-                logins.Add(newLogin);
+                var entries = File.ReadAllLines("login.txt");
+                foreach (var entry in entries)
+                {
+                    var credentials = entry.Split('|');
+                    var newLogin = new Login(credentials[0], credentials[1]);
+                    logins.Add(newLogin);
+                }
             }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e);
+                Error(0, "The 'login.txt' file could not be found");
+                throw;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            LoadAccounts(logins, accounts);
         }
 
-        private static void LoadAccounts(List<Account> accounts)
+        private static void LoadAccounts(List<Login> logins, List<Account> accounts)
         {
             /* Unfortunately I had to specify that account files begin with 'A'. Otherwise, the search pattern would also match shorter
                files names (specifically login.txt), due to some quirk with how windows looks for shortened file names. The official 
@@ -42,37 +55,48 @@ namespace BankingApp
 
             var accountFiles = Directory.GetFiles(Directory.GetCurrentDirectory(), "A??????.txt");
 
-            foreach (var accountFile in accountFiles)
+            try
             {
-                var allLines = File.ReadAllLines(accountFile);
-                var accountData = new string[7]; //First 7 fields are data, rest are transactions
-
-                // Separate data from label, keep only data
-                for (var i = 0; i < 7; i++) accountData[i] = allLines[i].Split('|')[1];
-
-                var accountId = Convert.ToInt32(accountData[0]);
-                var firstName = Convert.ToString(accountData[1]);
-                var lastName = Convert.ToString(accountData[2]);
-                var address = Convert.ToString(accountData[3]);
-                var phone = Convert.ToString(accountData[4]);
-                var email = Convert.ToString(accountData[5]);
-                var balance = Convert.ToDouble(accountData[6]);
-                var loadedAccount = new Account(accountId, firstName, lastName, address, phone, email, balance);
-
-                // Process and convert transaction lines
-                for (var i = 7; i < allLines.Length; i++)
+                foreach (var accountFile in
+                         accountFiles) // no need for try-catch as the code gets skipped if the array is empty
                 {
-                    var transactionData = allLines[i].Split('|');
-                    var date = DateTime.ParseExact(transactionData[0], "dd.MM.yyyy", null);
-                    var action = transactionData[1];
-                    var amount = Convert.ToDouble(transactionData[2]);
-                    var balanceRecord = Convert.ToDouble(transactionData[3]);
+                    var allLines = File.ReadAllLines(accountFile);
+                    var accountData = new string[7]; //First 7 fields are data, rest are transactions
 
-                    loadedAccount.AddTransaction(date, action, amount, balanceRecord);
+                    // Separate data from label, keep only data
+                    for (var i = 0; i < 7; i++) accountData[i] = allLines[i].Split('|')[1];
+
+                    var accountId = Convert.ToInt32(accountData[0]);
+                    var firstName = Convert.ToString(accountData[1]);
+                    var lastName = Convert.ToString(accountData[2]);
+                    var address = Convert.ToString(accountData[3]);
+                    var phone = Convert.ToString(accountData[4]);
+                    var email = Convert.ToString(accountData[5]);
+                    var balance = Convert.ToDouble(accountData[6]);
+                    var loadedAccount = new Account(accountId, firstName, lastName, address, phone, email, balance);
+
+                    // Process and convert transaction lines
+                    for (var i = 7; i < allLines.Length; i++)
+                    {
+                        var transactionData = allLines[i].Split('|');
+                        var date = DateTime.ParseExact(transactionData[0], "dd.MM.yyyy", null);
+                        var action = transactionData[1];
+                        var amount = Convert.ToDouble(transactionData[2]);
+                        var balanceRecord = Convert.ToDouble(transactionData[3]);
+
+                        loadedAccount.AddTransaction(date, action, amount, balanceRecord);
+                    }
+
+                    accounts.Add(loadedAccount);
                 }
-
-                accounts.Add(loadedAccount);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Error(0, "Existing accounts have been found but their data seems corrupted. Fix or remove the corrupted files.");
+            }
+
+            Login(logins, accounts);
         }
 
         private static void Login(List<Login> logins, List<Account> accounts)
@@ -188,11 +212,10 @@ namespace BankingApp
                         Statement(accounts);
                         break;
                     case 6:
-                        DeleteAccount();
+                        DeleteAccount(accounts);
                         break;
                     case 7:
-                        Exit();
-                        break;
+                        return;
                 }
             }
         }
@@ -574,17 +597,38 @@ namespace BankingApp
             return phonePattern.IsMatch(phone);
         }
 
-        private static void DeleteAccount()
+        private static void DeleteAccount(List<Account> accounts)
         {
-            Console.Clear();
-            Console.WriteLine("╔═══════════════════════════════════════════════╗");
-            Console.WriteLine("|                DELETE AN ACCOUNT              |");
-            Console.WriteLine("|═══════════════════════════════════════════════|");
-            Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
-            Console.WriteLine("|                                               |");
-            Console.WriteLine("|    Number:                                    |");
-            Console.WriteLine("|                                               |");
-            Console.WriteLine("╚═══════════════════════════════════════════════╝");
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("╔═══════════════════════════════════════════════╗");
+                Console.WriteLine("|               DELETE AN ACCOUNT               |");
+                Console.WriteLine("|═══════════════════════════════════════════════|");
+                Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("|    Number:                                    |");
+                Console.WriteLine("|                                               |");
+                Console.WriteLine("╚═══════════════════════════════════════════════╝");
+
+                Console.SetCursorPosition(13, 5);
+                var account = SearchAccounts(accounts);
+                if (account != null) // if a matching account was found
+                {
+                    
+                    Success(0,"Account found!");
+                    Error(0, "WARNING: This will delete the account permanently!");
+                    var again = YesNoChoice("Do you want to delete the selected account? (y/n): ");
+                    if (again == "n") continue;
+                    accounts.Remove(account);
+                    return;
+                }
+                
+                Error(3, "Account not found!");
+                var tryAgain = YesNoChoice("Find another account? (y/n): ");
+                if (tryAgain == "y") continue;
+                return;
+            }
         }
 
         private static void Exit()
