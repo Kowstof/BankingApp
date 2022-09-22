@@ -655,7 +655,7 @@ namespace BankingApp
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Thank you for using Krystof's banking system! Exiting...");
-            Thread.Sleep(1500);
+            Thread.Sleep(2100);
             Environment.Exit(0);
         }
     }
