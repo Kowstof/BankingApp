@@ -18,7 +18,6 @@ namespace BankingApp
             LoadLogins(logins);
             LoadAccounts(accounts);
             Login(logins, accounts);
-            Console.ReadKey();
         }
 
         private static void LoadLogins(List<Login> logins)
@@ -44,7 +43,9 @@ namespace BankingApp
             foreach (var accountFile in accountFiles)
             {
                 var allLines = File.ReadAllLines(accountFile);
-                var accountData = new string[7];
+                var accountData = new string[7]; //First 7 fields are data, rest are transactions
+
+                // Separate data from label, keep only data
                 for (var i = 0; i < 7; i++) accountData[i] = allLines[i].Split('|')[1];
 
                 var accountId = Convert.ToInt32(accountData[0]);
@@ -56,6 +57,18 @@ namespace BankingApp
                 var balance = Convert.ToDouble(accountData[6]);
                 var loadedAccount = new Account(accountId, firstName, lastName, address, phone, email, balance);
 
+                // Process and convert transaction lines
+                for (int i = 7; i < allLines.Length; i++)
+                {
+                    var transactionData = allLines[i].Split('|');
+                    var date = DateTime.ParseExact(transactionData[0], "dd.MM.yyyy", null);
+                    var action = transactionData[1];
+                    var amount = Convert.ToDouble(transactionData[2]);
+                    var balanceRecord = Convert.ToDouble(transactionData[3]);
+                    
+                    loadedAccount.AddTransaction(date, action, amount, balanceRecord);
+                }
+                
                 accounts.Add(loadedAccount);
             }
         }
@@ -384,6 +397,18 @@ namespace BankingApp
         {
             var phonePattern = new Regex("^[0-9]{10}$");
             return phonePattern.IsMatch(phone);
+        }
+
+        private static void DeleteAccount()
+        {
+            Console.Clear();
+            Console.WriteLine("╔═══════════════════════════════════════════════╗");
+            Console.WriteLine("|                DELETE AN ACCOUNT              |");
+            Console.WriteLine("|═══════════════════════════════════════════════|");
+            Console.WriteLine("|          ENTER 6-DIGIT ACCOUNT NUMBER         |");
+            Console.WriteLine("|                                               |");
+            Console.WriteLine("|    Number:                                    |");
+            Console.WriteLine("╚═══════════════════════════════════════════════╝");
         }
 
         private static void Exit()

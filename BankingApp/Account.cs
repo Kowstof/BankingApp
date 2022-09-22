@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 
 namespace BankingApp
 {
@@ -12,7 +14,7 @@ namespace BankingApp
         private readonly string _firstName;
         private readonly string _lastName;
         private readonly string _phone;
-        private readonly ArrayList _transactions = new ArrayList();
+        private List<Transaction> _transactions = new List<Transaction>();
         private double _balance;
 
         public Account(int accountNumber, string firstName, string lastName, string address, string phone, string email,
@@ -25,6 +27,19 @@ namespace BankingApp
             _phone = phone;
             _address = address;
             _balance = balance;
+        }
+
+        public void AddTransaction(DateTime date, string action, double amount, double balance)
+        {
+            var newTransaction = new Transaction(date, action, amount, balance);
+            _transactions.Add(newTransaction);
+            if (action == "Deposit")
+                _balance += amount;
+            else
+                _balance -= amount;
+
+            var transactionText = $"{date}|{action}|{amount}|{balance}";
+            File.AppendAllText($"A{AccountNumber}.txt", transactionText + Environment.NewLine);
         }
 
         public void AccountSummary()
